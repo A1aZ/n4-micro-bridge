@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "kind": "source-candidate",
   "includesTransportBinaries": false,
   "files": [
@@ -686,7 +686,7 @@
     {
       "path": "package.json",
       "bytes": 394,
-      "sha256": "e9790e31f0cc28e84db3b3d53f5c4171af706f4cad048ecc70c085918332c59d"
+      "sha256": "ce0f0d7253154a437676b19958901306f23e32608047de9855e53c02e6305745"
     },
     {
       "path": "requirements.txt",
@@ -695,8 +695,8 @@
     },
     {
       "path": "scripts/MiraboxLauncher.cs",
-      "bytes": 18167,
-      "sha256": "a13c3ab01864a5e19f9d39c58f18ae2a4f93f15d79d8a2748dad08f2d5bcc37b"
+      "bytes": 18632,
+      "sha256": "fe050820c2a2610197ef3f8c3f0396a3b414ef442970c4a421839aaad80bb324"
     },
     {
       "path": "scripts/archive-source.py",
@@ -1007,6 +1007,11 @@
       "path": "tests/launcher-browser.test.cjs",
       "bytes": 613,
       "sha256": "c7f80045e02393f674cd80b044cec371a5636e0694b38f761d298885bfbbfb01"
+    },
+    {
+      "path": "tests/launcher-timeout.test.cjs",
+      "bytes": 491,
+      "sha256": "8a0f4da4fc0bbb437391eedb2ce992550613728fa84661ca5f02d2b136a75cdc"
     },
     {
       "path": "tests/license-branding.test.cjs",

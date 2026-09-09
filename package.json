@@ -1,6 +1,6 @@
 {
   "name": "n4-micro-bridge",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "private": true,
   "description": "Community N4 to Micro HID bridge and local control center",
   "license": "AGPL-3.0-only",

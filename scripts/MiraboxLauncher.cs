@@ -60,7 +60,7 @@ class MiraboxLauncher : Form {
         var web=new Button {Text="打开控制页",Left=392,Top=324,Width=148,Height=50};StyleButton(web,false);Controls.Add(web);
         var logs=new Button {Text="查看日志",Left=552,Top=324,Width=136,Height=50};StyleButton(logs,false);Controls.Add(logs);
         Controls.Add(Caption("× 隐藏到系统托盘；— 最小化到任务栏。结束运行请在托盘选择“退出”。",32,395,656,38,10,Muted));
-        Controls.Add(Caption("© 2026 A1aZ  ·  AGPL-3.0-only  ·  0.1.0-rc.2",32,439,530,22,9,Muted));
+        Controls.Add(Caption("© 2026 A1aZ  ·  AGPL-3.0-only  ·  0.1.0-rc.3",32,439,530,22,9,Muted));
         Controls.Add(Caption("非官方兼容工具",560,439,140,22,9,Muted));
         start.Click+=async (s,e)=>await StartAll(); stop.Click+=(s,e)=>StopAll();
         web.Click+=(s,e)=>OpenControlPage();
@@ -124,13 +124,15 @@ class MiraboxLauncher : Form {
         if(!AssignProcessToJobObject(job,p.Handle)) {p.Kill();throw new Exception("无法建立进程清理保护，已取消启动。");}
         p.BeginOutputReadLine(); p.BeginErrorReadLine(); return p;
     }
+    static int RequestTimeout(string path){return path=="/api/native/start"?15000:5000;}
     string Request(string path,bool post=false) {
-        var r=(HttpWebRequest)WebRequest.Create(url+path); r.Proxy=null;r.Timeout=1500;
+        var r=(HttpWebRequest)WebRequest.Create(url+path); r.Proxy=null;r.Timeout=RequestTimeout(path);r.ReadWriteTimeout=RequestTimeout(path);
         if(post) {r.Method="POST";r.ContentType="application/json";var data=System.Text.Encoding.UTF8.GetBytes("{}");r.ContentLength=data.Length;using(var w=r.GetRequestStream())w.Write(data,0,data.Length);}
         using(var response=r.GetResponse()) using(var reader=new StreamReader(response.GetResponseStream())) return reader.ReadToEnd();
     }
     async Task StartAll() {
         if(busy || server!=null)return;busy=true;start.Enabled=false;stop.Enabled=false;
+        string step="启动控制页";
         try {
             // Never take over an existing listener or terminate somebody else's service.
             int port=18792; var probe=new TcpListener(IPAddress.Loopback,port);probe.Start();probe.Stop(); url="http://127.0.0.1:"+port;
@@ -142,16 +144,19 @@ class MiraboxLauncher : Form {
             for(int i=0;i<35;i++) {if(server.HasExited)throw new Exception("控制页启动失败，请查看日志。");try {var state=await Task.Run(()=>Request("/api/state"));if(state.Contains("mirabox.codex.micro.webui") && state.Contains("\"pid\":"+server.Id)) {ready=true;break;}}catch {} await Task.Delay(200);}
             CheckExit();if(!ready)throw new Exception("控制页未能就绪。");
             status.Text="正在启动 N4 与 Micro 桥接…";
+            step="检查设备占用并启动 N4";
             await Task.Run(()=>Request("/api/native/start",true));
             CheckExit();
+            step="启动 Micro Relay";
             relay=Launch("runtime/python/python.exe","scripts/micro-webui-relay.py --live --webui-url "+url,"relay");
             await Task.Delay(1200);CheckExit();if(relay.HasExited)throw new Exception("Micro 桥接未能启动：可能旧 Relay 正在运行，或虚拟驱动未安装。详见 relay.log。");
             status.Text="服务已启动。需要配置或查看设备状态时，点击“打开控制页”。\n"+url;
-        } catch(Exception e) {StopAll();if(!IsDisposed)status.Text=e.Message;} finally {busy=false;if(!IsDisposed){start.Enabled=true;stop.Enabled=true;if(exitRequested)Close();}}
+        } catch(Exception e) {StopAll();if(!IsDisposed)status.Text=step+"失败："+e.Message;} finally {busy=false;if(!IsDisposed){start.Enabled=true;stop.Enabled=true;if(exitRequested)Close();}}
     }
     void StopAll() {if(job!=IntPtr.Zero){TerminateJobObject(job,0);CloseHandle(job);job=IntPtr.Zero;} if(server!=null)server.Dispose();if(relay!=null)relay.Dispose();server=null;relay=null;status.Text="已停止本启动器的服务。可以重新启动。";}
     void SelfTest() {
         try {
+            if(RequestTimeout("/api/native/start")<10000||RequestTimeout("/api/native/status")<5000)throw new Exception("HTTP timeout too short for backend process probes");
             var parser=new JavaScriptSerializer();
             if(DeviceSummary(parser.Deserialize<Dictionary<string,object>>("{\"status\":\"error\",\"n4\":{\"opened\":true,\"ready\":true}}"))!="N4 未连接")throw new Exception("Failed N4 incorrectly marked connected");
             if(DeviceSummary(parser.Deserialize<Dictionary<string,object>>("{\"status\":\"running\",\"stale\":true,\"n4\":{\"opened\":true,\"ready\":true}}"))!="设备状态已失联")throw new Exception("Stale N4 incorrectly marked connected");
