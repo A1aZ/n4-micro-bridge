@@ -14,54 +14,9 @@
       "sha256": "0dc28c513f759f9b8945e20ab7be2f327ad8c6abb9b723c797c88f2a0e89e9e0"
     },
     {
-      "path": "CHANGELOG.md",
-      "bytes": 1111,
-      "sha256": "1f768b8d8f48d185eb7a8952e6a28183c0258ee7ee251b9829d4fd8f74a5641a"
-    },
-    {
-      "path": "CONTRIBUTING.md",
-      "bytes": 1376,
-      "sha256": "213666177b507bf26bff5071d40805c5fe9e0c03c474b14030265dc6942f0b4b"
-    },
-    {
-      "path": "COPYRIGHT",
-      "bytes": 375,
-      "sha256": "0d4201d6ebfda9f8ccdc2788dd87b6cfc1f455764fb68564f876eb940ca3e5ae"
-    },
-    {
-      "path": "LICENSE",
-      "bytes": 34523,
-      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
-    },
-    {
-      "path": "README.md",
-      "bytes": 3609,
-      "sha256": "3ccb04ffd6fbb45d8609a95cb6f5b29a69e539365cc853e328b12a08748d2d83"
-    },
-    {
-      "path": "SECURITY.md",
-      "bytes": 1224,
-      "sha256": "38354eb3ca30a3ad9f5ecdd7f70fd212b966e9ae76cd48f3fe01a3d647b016b7"
-    },
-    {
-      "path": "THIRD_PARTY_NOTICES.md",
-      "bytes": 2755,
-      "sha256": "0e90705ec6f174eb13be2da94067c49610c0295f4cc205d9f06aa2c6fa4bb0d7"
-    },
-    {
-      "path": "assets/NotoSans-LICENSE.txt",
-      "bytes": 4301,
-      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
-    },
-    {
       "path": "assets/app/AGPL-3.0.txt",
       "bytes": 34523,
       "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
-    },
-    {
-      "path": "assets/app/README.md",
-      "bytes": 1003,
-      "sha256": "e3eb063eda849f63aa9aa54545aece9f30f558fa826ec78e6497518caa9b973f"
     },
     {
       "path": "assets/app/app.ico",
@@ -74,14 +29,19 @@
       "sha256": "0157567a93bd4078452fb304cbf0fa4b62d238dca94d54455d48a27f5d27ee55"
     },
     {
+      "path": "assets/app/README.md",
+      "bytes": 1003,
+      "sha256": "e3eb063eda849f63aa9aa54545aece9f30f558fa826ec78e6497518caa9b973f"
+    },
+    {
       "path": "assets/node-LICENSE.txt",
       "bytes": 156926,
       "sha256": "4573185d56580da2b890ba34a85a409257640f1c5632eade4300137266194d18"
     },
     {
-      "path": "assets/themes/README.md",
-      "bytes": 2465,
-      "sha256": "e6a5e16ceb34909337088048652ad9eb4d1cb243d9fc0db765420033b42edfc5"
+      "path": "assets/NotoSans-LICENSE.txt",
+      "bytes": 4301,
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
     },
     {
       "path": "assets/themes/catalog.json",
@@ -454,11 +414,6 @@
       "sha256": "b788d6216bfb7749206353aaa5e2de0d678f9d0c97de218744672c3458312173"
     },
     {
-      "path": "assets/themes/icons/LICENSE",
-      "bytes": 1092,
-      "sha256": "ddbe6082ec3cf979db47e5af549d2849c5d6182b3e005ef91ce1dbb9eb122f11"
-    },
-    {
       "path": "assets/themes/icons/arrow-bend-up-right-fill.svg",
       "bytes": 269,
       "sha256": "260f12b29e088c4ee787b09df70e25cd107ed6582afc9a6195c455af6761d77b"
@@ -507,6 +462,11 @@
       "path": "assets/themes/icons/gear-six-fill.svg",
       "bytes": 727,
       "sha256": "dc303bf88571d9aa8d56c30d2630303aa7aba4ca21c21010be3549d6c17666ce"
+    },
+    {
+      "path": "assets/themes/icons/LICENSE",
+      "bytes": 1092,
+      "sha256": "ddbe6082ec3cf979db47e5af549d2849c5d6182b3e005ef91ce1dbb9eb122f11"
     },
     {
       "path": "assets/themes/icons/lightning-fill.svg",
@@ -564,9 +524,29 @@
       "sha256": "cee7f5396e855eb535011c0dbaa3ee4a55589aabd589f26690dac496780f8e93"
     },
     {
+      "path": "assets/themes/README.md",
+      "bytes": 2465,
+      "sha256": "e6a5e16ceb34909337088048652ad9eb4d1cb243d9fc0db765420033b42edfc5"
+    },
+    {
       "path": "assets/themes/status-art.json",
       "bytes": 172,
       "sha256": "61c20f6c974cacfff8c2e0b901bcc88ec8a48709c70a16e307fc889171b07287"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 1111,
+      "sha256": "1f768b8d8f48d185eb7a8952e6a28183c0258ee7ee251b9829d4fd8f74a5641a"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "bytes": 1376,
+      "sha256": "213666177b507bf26bff5071d40805c5fe9e0c03c474b14030265dc6942f0b4b"
+    },
+    {
+      "path": "COPYRIGHT",
+      "bytes": 375,
+      "sha256": "0d4201d6ebfda9f8ccdc2788dd87b6cfc1f455764fb68564f876eb940ca3e5ae"
     },
     {
       "path": "docs/micro-native-status.md",
@@ -589,9 +569,9 @@
       "sha256": "d3ad1e67ba6a2375250eab2abe06ec622aa10235b2cf65939bc17de8e96964e5"
     },
     {
-      "path": "driver/README.md",
-      "bytes": 8361,
-      "sha256": "59733448a2bffb45bf849a648364c72f9af3b27c0914aabfa1113b5e9e450ad4"
+      "path": "docs/troubleshooting.md",
+      "bytes": 1069,
+      "sha256": "5cccfa1f6562e49a43703973687c47eefe54b488c46fd4e78725b768c0a9486c"
     },
     {
       "path": "driver/build-driver.ps1",
@@ -602,16 +582,6 @@
       "path": "driver/codexmicro-umdf/CodexMicroUm.sln",
       "bytes": 940,
       "sha256": "bf221bef4c0e9313dd8174219ea146630f05a625ba3d397d365b3d0bd773d37a"
-    },
-    {
-      "path": "driver/codexmicro-umdf/MS-PL.txt",
-      "bytes": 2666,
-      "sha256": "85c43fcff20a5da292dd68cc6675a3adda351a08ec62e5ea3667ed415ff0ba90"
-    },
-    {
-      "path": "driver/codexmicro-umdf/README.md",
-      "bytes": 1170,
-      "sha256": "d367ea23ec18ee351b4f4100400548af5b6f4567f777335fda51d69a91bfb9db"
     },
     {
       "path": "driver/codexmicro-umdf/driver/bridge.c",
@@ -629,6 +599,11 @@
       "sha256": "6085f2ef035fdf7ba6b0c584de64451b39d21e2bbe6d751dfd5c310f2627b5e6"
     },
     {
+      "path": "driver/codexmicro-umdf/driver/umdf2/codexmicro.rc",
+      "bytes": 531,
+      "sha256": "cf1e2f171f9ed0d56d8f33e8645fb77cd60ad44b9606dbddfc81c607561511b9"
+    },
+    {
       "path": "driver/codexmicro-umdf/driver/umdf2/CodexMicroUm.inx",
       "bytes": 2210,
       "sha256": "44dbf482b00c567dd51e57017b20b07506dd054921b0fede7f6fd20b6c14adea"
@@ -637,11 +612,6 @@
       "path": "driver/codexmicro-umdf/driver/umdf2/CodexMicroUm.vcxproj",
       "bytes": 11278,
       "sha256": "b91ced08594e888389d3f2bd1626ef6774f83f5f96d01f1a454e16a5c0dc3456"
-    },
-    {
-      "path": "driver/codexmicro-umdf/driver/umdf2/codexmicro.rc",
-      "bytes": 531,
-      "sha256": "cf1e2f171f9ed0d56d8f33e8645fb77cd60ad44b9606dbddfc81c607561511b9"
     },
     {
       "path": "driver/codexmicro-umdf/driver/umdf2/util.c",
@@ -654,9 +624,19 @@
       "sha256": "bcb3090bb455b11bd297262117cb174716ff8c427b515e945cab9f11d3bd24c5"
     },
     {
+      "path": "driver/codexmicro-umdf/MS-PL.txt",
+      "bytes": 2666,
+      "sha256": "85c43fcff20a5da292dd68cc6675a3adda351a08ec62e5ea3667ed415ff0ba90"
+    },
+    {
       "path": "driver/codexmicro-umdf/protocol/codexmicro_protocol.h",
       "bytes": 7071,
       "sha256": "dcf0ba39e75cb61521bcf483b33c0a5bf5f026d9ea4daca384db13afbff2e4f1"
+    },
+    {
+      "path": "driver/codexmicro-umdf/README.md",
+      "bytes": 1170,
+      "sha256": "d367ea23ec18ee351b4f4100400548af5b6f4567f777335fda51d69a91bfb9db"
     },
     {
       "path": "driver/create-discoverable-device.ps1",
@@ -674,9 +654,19 @@
       "sha256": "66eda023d57ff5d50072e8b6daf1ea5834a190b1f1dce525d4abc87bbabd9e26"
     },
     {
+      "path": "driver/README.md",
+      "bytes": 8361,
+      "sha256": "59733448a2bffb45bf849a648364c72f9af3b27c0914aabfa1113b5e9e450ad4"
+    },
+    {
       "path": "examples/n4-calibrated.json",
       "bytes": 3729,
       "sha256": "38a8d251d23b272cd37052332d0919b94285563289163a3b15839a24ef0db874"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 34523,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
     },
     {
       "path": "package.json",
@@ -684,14 +674,14 @@
       "sha256": "e9790e31f0cc28e84db3b3d53f5c4171af706f4cad048ecc70c085918332c59d"
     },
     {
+      "path": "README.md",
+      "bytes": 3177,
+      "sha256": "4fe050c189b40600bbbfb98f228d27d0782520cdcfa510efdfd99e80a88b0b86"
+    },
+    {
       "path": "requirements.txt",
       "bytes": 178,
       "sha256": "d8d0132c9bb966b07fff191575605260793eddcb865d86618060307f6aa105f3"
-    },
-    {
-      "path": "scripts/MiraboxLauncher.cs",
-      "bytes": 15792,
-      "sha256": "be1eff7fd04845ec3048bb2ebbc812706611b61ae6c6a1c4ce702c9a60e6cedc"
     },
     {
       "path": "scripts/archive-source.py",
@@ -760,8 +750,8 @@
     },
     {
       "path": "scripts/export-source.cjs",
-      "bytes": 3181,
-      "sha256": "3ffac9e4d1bfb30acd37690af3444be2dac3aefe2655737a8c2c33077c65f3ac"
+      "bytes": 3202,
+      "sha256": "d8efe5d4a425f3b03d43a396e28ef0b58f1b651ce585613f836ea141a1ff1332"
     },
     {
       "path": "scripts/micro-hid-selftest.py",
@@ -772,6 +762,11 @@
       "path": "scripts/micro-webui-relay.py",
       "bytes": 365,
       "sha256": "4e5804fe71ca542fd2650939df882e7a226923fdf599a51181a110643b87726b"
+    },
+    {
+      "path": "scripts/MiraboxLauncher.cs",
+      "bytes": 15792,
+      "sha256": "be1eff7fd04845ec3048bb2ebbc812706611b61ae6c6a1c4ce702c9a60e6cedc"
     },
     {
       "path": "scripts/n4-hidapi-capture.py",
@@ -819,6 +814,11 @@
       "sha256": "7ac63e923df3b45ebf256096df41991c7a2932b11313aca9315da432e464c1c8"
     },
     {
+      "path": "SECURITY.md",
+      "bytes": 1224,
+      "sha256": "38354eb3ca30a3ad9f5ecdd7f70fd212b966e9ae76cd48f3fe01a3d647b016b7"
+    },
+    {
       "path": "src/codexmicro_companion.py",
       "bytes": 26491,
       "sha256": "30d74d8af1c2c9857c76e75af8b75a7072238e361c6a41352f6ecf29bd5309b2"
@@ -837,6 +837,16 @@
       "path": "src/config-store.cjs",
       "bytes": 2258,
       "sha256": "e971e330d46adf776b7eb173d40e2740b4ea3aff7e3c496cb3b0b5dabffceb44"
+    },
+    {
+      "path": "src/micro_status.py",
+      "bytes": 591,
+      "sha256": "a541427bddf5be073779b92f175e6f6e57ba3456ef79e2e00d48075b8845e3ad"
+    },
+    {
+      "path": "src/micro_webui_relay.py",
+      "bytes": 5360,
+      "sha256": "cd6191192fde9535ae1fcbcc2dc6407e097ca197478189ad89ea99e1013bff57"
     },
     {
       "path": "src/micro-bridge.cjs",
@@ -867,36 +877,6 @@
       "path": "src/micro-transport.cjs",
       "bytes": 5567,
       "sha256": "1c322bf344eb6411f93af4da9be502a7b7beb9b04262d86ff30ed12d8364a67e"
-    },
-    {
-      "path": "src/micro_status.py",
-      "bytes": 591,
-      "sha256": "a541427bddf5be073779b92f175e6f6e57ba3456ef79e2e00d48075b8845e3ad"
-    },
-    {
-      "path": "src/micro_webui_relay.py",
-      "bytes": 5360,
-      "sha256": "cd6191192fde9535ae1fcbcc2dc6407e097ca197478189ad89ea99e1013bff57"
-    },
-    {
-      "path": "src/n4-input.cjs",
-      "bytes": 3561,
-      "sha256": "d478f4798d11f3e252b9e8f86514c9733645a4dc79614ed199cc9616464417ca"
-    },
-    {
-      "path": "src/n4-knob-actions.cjs",
-      "bytes": 764,
-      "sha256": "8d2730bc94fced9ac78e92ae0b48d0b979d987fe2ae5e822760e6e630e2c5a6d"
-    },
-    {
-      "path": "src/n4-theme-svg.cjs",
-      "bytes": 6739,
-      "sha256": "2587d8f0fd50481cf29e4096a5b8c7eda3efa7a1673abdaa3940b760f52e2c8f"
-    },
-    {
-      "path": "src/n4-visuals.cjs",
-      "bytes": 27725,
-      "sha256": "b929b87cd6d913d253ee0a12e6ea597e7d8af248f12c393754c87abe66290c0b"
     },
     {
       "path": "src/n4_frame_cache.py",
@@ -937,6 +917,26 @@
       "path": "src/n4_webui_bridge.py",
       "bytes": 31548,
       "sha256": "140c76430afbc3887dfa8d95d19d5f95d00b9878999f0484582ac0b5d2c56ad8"
+    },
+    {
+      "path": "src/n4-input.cjs",
+      "bytes": 3561,
+      "sha256": "d478f4798d11f3e252b9e8f86514c9733645a4dc79614ed199cc9616464417ca"
+    },
+    {
+      "path": "src/n4-knob-actions.cjs",
+      "bytes": 764,
+      "sha256": "8d2730bc94fced9ac78e92ae0b48d0b979d987fe2ae5e822760e6e630e2c5a6d"
+    },
+    {
+      "path": "src/n4-theme-svg.cjs",
+      "bytes": 6739,
+      "sha256": "2587d8f0fd50481cf29e4096a5b8c7eda3efa7a1673abdaa3940b760f52e2c8f"
+    },
+    {
+      "path": "src/n4-visuals.cjs",
+      "bytes": 27725,
+      "sha256": "b929b87cd6d913d253ee0a12e6ea597e7d8af248f12c393754c87abe66290c0b"
     },
     {
       "path": "src/native-child.cjs",
@@ -1064,14 +1064,14 @@
       "sha256": "e37cd180fd2fa3b25f916de361f91011bc8ead7bb176285d5b458d5ce32bf75d"
     },
     {
-      "path": "tests/test_codexmicro_companion.py",
-      "bytes": 11067,
-      "sha256": "9bc0972ad23766d267168106321524c712fba2ec746b78b1e54c901448641c96"
-    },
-    {
       "path": "tests/test_codexmicro_companion_probe.py",
       "bytes": 9385,
       "sha256": "6c5302ee15c382cc78a03a66c4acac0a5e5d5c75d793975ba3d1f78aaa15c158"
+    },
+    {
+      "path": "tests/test_codexmicro_companion.py",
+      "bytes": 11067,
+      "sha256": "9bc0972ad23766d267168106321524c712fba2ec746b78b1e54c901448641c96"
     },
     {
       "path": "tests/test_codexmicro_sideband.py",
@@ -1094,14 +1094,14 @@
       "sha256": "c5a1948235f0e1c7f84ad8a69942e5e23b84abec1429fa116661850ca1a343ca"
     },
     {
-      "path": "tests/test_n4_hidapi.py",
-      "bytes": 6118,
-      "sha256": "2c36b327a3e772146f518d573fa34a5764573b34b18192600d0954b1cb83a665"
-    },
-    {
       "path": "tests/test_n4_hidapi_capture.py",
       "bytes": 1676,
       "sha256": "ae39aa54fb148882e244e9cebcacea9a8de31c867a01e775a4e63c3b6a0d4566"
+    },
+    {
+      "path": "tests/test_n4_hidapi.py",
+      "bytes": 6118,
+      "sha256": "2c36b327a3e772146f518d573fa34a5764573b34b18192600d0954b1cb83a665"
     },
     {
       "path": "tests/test_n4_info_strip.py",
@@ -1184,9 +1184,29 @@
       "sha256": "fcc166ccc6b6564a66ca0c31fdc0f5d341a21a6adc2aae809ddc05da8fee46b1"
     },
     {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 2755,
+      "sha256": "0e90705ec6f174eb13be2da94067c49610c0295f4cc205d9f06aa2c6fa4bb0d7"
+    },
+    {
+      "path": "upstream/openmicrokbd/LICENSE",
+      "bytes": 1088,
+      "sha256": "fe55f29b79c65aaaf1e3836d739c2692cc317735ae67687ce28de231b3b99de8"
+    },
+    {
       "path": "upstream/StreamDock-Device-SDK/LICENSE",
       "bytes": 1090,
       "sha256": "149058ece87cbecc466518adf38bde96506d08dd61b21f7b942bb89dda96ecc4"
+    },
+    {
+      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/main.py",
+      "bytes": 9433,
+      "sha256": "fa7a1e57a549ce369ff5e3c472b75ca6c91e559cabd164690d91751c856df74f"
+    },
+    {
+      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/DeviceConfig.py",
@@ -1197,6 +1217,11 @@
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/DeviceManager.py",
       "bytes": 11523,
       "sha256": "8d2338e98fece398785ab0704013a3345f3f9a8a7efcdab6b37df74e540bb400"
+    },
+    {
+      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Devices/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Devices/GifController.py",
@@ -1219,11 +1244,6 @@
       "sha256": "8c1e5f498c59adbba2d3c25ac7dda3c0d103b61a1a8453df8a06f7adb9ebd37c"
     },
     {
-      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Devices/StreamDock293V3.py",
-      "bytes": 5467,
-      "sha256": "f2f215736f82ecca3ccfd56d80612f50a97091ec022f7dcbc822d78b9e678dfa"
-    },
-    {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Devices/StreamDock293s.py",
       "bytes": 5513,
       "sha256": "f1c8904259612a2984d7811c60549077e21f53ccea5eb76b7b7a279182a15936"
@@ -1232,6 +1252,11 @@
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Devices/StreamDock293sV3.py",
       "bytes": 5840,
       "sha256": "178fe47d7696708eedfc031545fe5d04ce4a483f8d6b905d65d22f39d8743f2c"
+    },
+    {
+      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Devices/StreamDock293V3.py",
+      "bytes": 5467,
+      "sha256": "f2f215736f82ecca3ccfd56d80612f50a97091ec022f7dcbc822d78b9e678dfa"
     },
     {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Devices/StreamDockM18.py",
@@ -1274,24 +1299,19 @@
       "sha256": "38b50d9ca9fa39d0f51717a36990ab45cafec4b2efefa50d149270edda8b36e9"
     },
     {
-      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Devices/__init__.py",
-      "bytes": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    },
-    {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/FeatrueOption.py",
       "bytes": 746,
       "sha256": "84e43714dad5e7404cd8008aff66d63f4858c416a30c0a5c7e9f7a233f4a0fb7"
     },
     {
-      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/ImageHelpers/PILHelper.py",
-      "bytes": 3652,
-      "sha256": "2299a932aba1988f99c97e8937e672c77b6ec0001d435fb5a8c2b352fb8bcb9d"
-    },
-    {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/ImageHelpers/__init__.py",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/ImageHelpers/PILHelper.py",
+      "bytes": 3652,
+      "sha256": "2299a932aba1988f99c97e8937e672c77b6ec0001d435fb5a8c2b352fb8bcb9d"
     },
     {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/InputTypes.py",
@@ -1304,34 +1324,19 @@
       "sha256": "b6dcb815f6aed5847759f2f43739e28e2aafc8dd00abcd3ad8ed4747cf858902"
     },
     {
-      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Transport/LibUSBHIDAPI.py",
-      "bytes": 48675,
-      "sha256": "c3d07ac020cac7842d44a23109420c3e8825582a0b719e2fc4e856ba24ef386f"
-    },
-    {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Transport/__init__.py",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
+      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Transport/LibUSBHIDAPI.py",
+      "bytes": 48675,
+      "sha256": "c3d07ac020cac7842d44a23109420c3e8825582a0b719e2fc4e856ba24ef386f"
+    },
+    {
       "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/Transport/test.py",
       "bytes": 513,
       "sha256": "75c8b4cb18be8a0f77dd4bc28ab6bf08f4f0d1346714d4831452c9358a49563c"
-    },
-    {
-      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/StreamDock/__init__.py",
-      "bytes": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    },
-    {
-      "path": "upstream/StreamDock-Device-SDK/Python-SDK/src/main.py",
-      "bytes": 9433,
-      "sha256": "fa7a1e57a549ce369ff5e3c472b75ca6c91e559cabd164690d91751c856df74f"
-    },
-    {
-      "path": "upstream/openmicrokbd/LICENSE",
-      "bytes": 1088,
-      "sha256": "fe55f29b79c65aaaf1e3836d739c2692cc317735ae67687ce28de231b3b99de8"
     },
     {
       "path": "webui/button-test.html",

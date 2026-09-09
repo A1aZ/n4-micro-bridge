@@ -1,33 +1,31 @@
 # N4 Bridge · N4 键桥
 
-Windows x64 社区项目 · 0.1.0-rc.2 · A1aZ。把 N4 按键、旋钮和屏幕接入 Micro HID 协议。
+由 **A1aZ** 开发的 Windows x64 社区工具，让 Mirabox N4 的按键、旋钮和屏幕接入 Codex Micro 工作流。
 
-**非 OpenAI、Work Louder 或 Mirabox 官方产品。** 基于一台 N4 实测，不保证所有固件或未来主机版本兼容。
+> 非 OpenAI、Work Louder 或 Mirabox 官方产品。目前仅支持 N4，项目处于测试阶段。
 
 ## 功能
 
-- 10个屏幕按键、4个旋钮、长条信息屏；可视化输入与纯色诊断。
-- 虚拟HID主/Companion双collection，Micro RPC与原生状态颜色，不另外读取任务API。
-- 原生尺寸状态机器人、内存JPEG帧缓存、官方默认编码。
-- 便携启动器管理WebUI、N4连接和Relay。× 隐藏到系统托盘，— 最小化到任务栏；托盘“退出”才清理自己启动的进程。
+- 使用屏幕按键切换会话，查看主机提供的任务状态。
+- 使用旋钮进行导航、聊天滚动、推理强度调整和设备亮度控制。
+- 状态机器人、原生状态色带和选中脉动。
+- 本地控制页提供配置、按键对照和显示诊断。
+- Windows 启动器支持系统托盘运行，不自动打开网页。
 
-## 当前边界
+## 开始使用
 
-- 虚拟驱动在开发机器上安装识别成功；公开生产签名和干净机器安装尚未完成，不是通用即装即用正式产品。
-- 旋钮按压仅按下包，合成释放不能表示真实长按时长。
-- 固件输入码可能不同。示例上排01–05、下排06–0A，需用按键对照台验证。
-- 推理强度需先在主机Micro设置绑定左右方向，再开启配置确认项。
-- 曾有扫描线异常，恢复官方默认JPEG并断电后正常。动效长期稳定性仍需实机验证，SDK成功不等于面板显示成功。
+**本仓库只发布源码，不提供预编译 EXE 或驱动。** 请先阅读[构建与发布说明](docs/release.md)，自行准备依赖并构建。构建出的启动器为 `Mirabox.exe`；运行后点击“启动全部”，需要配置时手动选择“打开控制页”。
 
-## 便携版使用
+控制页默认地址：http://127.0.0.1:18792/real-n4 。
 
-保留完整目录，双击 Mirabox.exe → 启动全部。控制页默认 http://127.0.0.1:18792/real-n4 。
+实际连接需要 N4 SDK 的传输库和单独构建、安装的虚拟驱动。不要同时用 StreamDock、WebHID 页面和本工具打开同一台 N4。
 
-配置在 data/config.json，日志在 logs/。不要将它们公开上传。不要同时用StreamDock、WebHID和原生桥接打开N4。首次使用仍需独立安装虚拟驱动；日常启动不会安装证书或驱动。
+## 环境与本地测试
 
-## 开发和测试
-
-准备 Node.js 22+、CPython 3.11、Windows x64。
+- Windows x64
+- Node.js 22 或更新版本
+- CPython 3.11
+- 实体连接和驱动构建所需依赖见[构建说明](docs/release.md)
 
 ```powershell
 python -m venv .hidapi-venv
@@ -35,9 +33,9 @@ python -m venv .hidapi-venv
 powershell -File scripts/test.ps1 -PythonPath .\.hidapi-venv\Scripts\python.exe
 ```
 
-测试不需要USB，也不安装驱动。Node无运行时npm依赖；重建图标时额外准备Sharp，运行 build-theme-assets.cjs 和 build-status-robots.cjs。日常运行使用已生成资源。
+这些测试不访问 USB，也不安装驱动。Node 服务无 npm 运行时依赖，图标资源已包含在仓库中。
 
-首次创建配置并启动WebUI：
+仅启动控制页进行软件侧检查：
 
 ```powershell
 New-Item -ItemType Directory data -Force
@@ -45,23 +43,28 @@ Copy-Item examples/n4-calibrated.json data/config.json
 powershell -File scripts/start-webui.ps1 -Port 18792
 ```
 
-实体N4需要上游transport二进制，参见[发布流程](docs/release.md)。源码导出不包含二进制运行时。Micro Relay另外需要已安装的虚拟驱动。
+复制示例配置仅用于首次初始化，请勿覆盖已有配置。
 
-## 结构
+## 限制与注意事项
 
-- src/：协议、映射、渲染、传输。
-- webui/：控制、配置、诊断页面。
-- driver/：MS-PL虚拟HID驱动源码与显式安装工具。
-- scripts/：测试、构建、导出。
-- examples/：无个人信息的示例配置。
-- upstream/：第三方源代码及原始许可证。
+- 当前基于有限实机测试，不保证所有 N4 固件及未来主机版本兼容。
+- 正式驱动签名及干净系统安装验证尚未完成，需要开发者自行评估安装方案。
+- 旋钮按压无法可靠提供真实长按时长；部分功能需要先在主机 Micro 设置中配置。
+- 不同固件可能有不同按键编号，首次连接请使用按键对照台校准。
+- 部分固件的显示稳定性仍待验证；遇到异常请停止服务，并参考[问题排查](docs/troubleshooting.md)。
+- 服务仅供本机使用，不应暴露到公网。分享问题记录前请检查并脱敏配置、日志及设备信息。
 
-## 发布与许可
+## 文档
 
-用 `node scripts/export-source.cjs` 导出允许清单内的源码及SHA-256清单，**不要直接压缩整个开发目录**。
+- [构建与发布](docs/release.md)
+- [启动器使用](docs/portable-app.md)
+- [Micro 原生状态](docs/micro-native-status.md)
+- [问题排查](docs/troubleshooting.md)
+- [贡献指南](CONTRIBUTING.md)
+- [安全说明](SECURITY.md)
 
-原创应用代码与原创图标采用 AGPL-3.0-only，Copyright © 2026 A1aZ；Microsoft派生驱动独立保留MS-PL，不能把整个目录一概重授权为AGPL。第三方依赖保留各自许可。详见[第三方声明](THIRD_PARTY_NOTICES.md)、[安全说明](SECURITY.md)、[贡献指南](CONTRIBUTING.md)、[发布流程](docs/release.md)。
+## 许可证
 
-对外仅发布源码，用户自行获取依赖、编译应用及驱动。本地EXE用于开发验证，不作为公开Release附件。修改后通过网络提供服务时，应遵守AGPL第13节的对应源码提供义务。
+原创应用代码及原创资源采用 **AGPL-3.0-only**，Copyright © 2026 **A1aZ**。
 
-当前为发布准备阶段，不自动创建远程仓库或上传文件。
+独立构建的 Microsoft 派生驱动保留 **MS-PL**，其他第三方组件保留各自许可；本仓库不是全部采用同一种许可证。详见 [LICENSE](LICENSE)、[COPYRIGHT](COPYRIGHT) 和[第三方声明](THIRD_PARTY_NOTICES.md)。

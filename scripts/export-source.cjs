@@ -26,7 +26,7 @@ function exportSource(target){
  collect(path.join(root,'assets'),'assets',files);
  collect(path.join(root,'upstream/StreamDock-Device-SDK/Python-SDK/src'),'upstream/StreamDock-Device-SDK/Python-SDK/src',files);
  files.push('upstream/StreamDock-Device-SDK/LICENSE','upstream/openmicrokbd/LICENSE');
- for(const name of ['release.md','portable-app.md','micro-native-status.md','status-robot.md'])files.push('docs/'+name);
+ for(const name of ['release.md','portable-app.md','micro-native-status.md','status-robot.md','troubleshooting.md'])files.push('docs/'+name);
  const manifest=[];
  for(const rel of [...new Set(files)].sort()){
   const input=path.join(root,rel),data=fs.readFileSync(input);
