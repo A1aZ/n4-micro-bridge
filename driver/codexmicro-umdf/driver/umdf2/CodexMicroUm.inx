@@ -1,0 +1,93 @@
+;/*++
+;
+;Copyright (c) Microsoft Corporation All rights Reserved
+;
+;Module Name:
+;
+;    CodexMicroUm.inf
+;
+;Abstract:
+;    INF file for installing HID minidriver (UMDF 2 version)
+;
+; Installation Notes:
+;    Using Devcon: Type "devcon install CodexMicroUm.inf root\MiraboxCodexMicro" to install
+;
+; Important:
+;    This INF depends on MsHidUmdf.inf, which was introduced in build 22000
+;
+;--*/
+[Version]
+Signature="$WINDOWS NT$"
+Class=HIDClass
+ClassGuid={745a17a0-74d3-11d0-b6fe-00a0c90f57da}
+Provider=%ProviderString%
+DriverVer=09/07/2026,0.1.0.0
+CatalogFile=wudf.cat
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1=%Disk_Description%,,,
+
+[SourceDisksFiles]
+CodexMicroUm.dll=1
+
+; ================= Device section =====================
+
+[Manufacturer]
+%ManufacturerString%=Microsoft, NT$ARCH$.10.0...22000
+
+[Microsoft.NT$ARCH$.10.0...22000]
+%DeviceDesc%=CodexMicroUm, root\MiraboxCodexMicro
+
+[CodexMicroUm.NT]
+CopyFiles=UMDriverCopy
+Include=MsHidUmdf.inf
+Needs=MsHidUmdf.NT
+Include=WUDFRD.inf
+Needs=WUDFRD_LowerFilter.NT
+
+[CodexMicroUm.NT.hw]
+Include=MsHidUmdf.inf
+Needs=MsHidUmdf.NT.hw
+Include=WUDFRD.inf
+Needs=WUDFRD_LowerFilter.NT.hw
+
+[CodexMicroUm.NT.Services]
+Include=MsHidUmdf.inf
+Needs=MsHidUmdf.NT.Services
+Include=WUDFRD.inf
+Needs=WUDFRD_LowerFilter.NT.Services
+
+[CodexMicroUm.NT.Filters]
+Include=WUDFRD.inf
+Needs=WUDFRD_LowerFilter.NT.Filters
+
+[CodexMicroUm.NT.Wdf]
+UmdfService="CodexMicroUm", CodexMicroUm_Install
+UmdfServiceOrder=CodexMicroUm
+UmdfKernelModeClientPolicy=AllowKernelModeClients
+UmdfFileObjectPolicy=AllowNullAndUnknownFileObjects
+UmdfMethodNeitherAction=Copy
+UmdfFsContextUsePolicy=CanUseFsContext2
+
+[CodexMicroUm_Install]
+UmdfLibraryVersion=$UMDFVERSION$
+ServiceBinary="%13%\CodexMicroUm.dll"
+
+; ================= copy files =====================
+
+[UMDriverCopy]
+CodexMicroUm.dll
+
+;---------------------------------------------------------------;
+
+[Strings]
+ProviderString     ="Mirabox"
+ManufacturerString ="Mirabox"
+ClassName          ="HIDClass"
+Disk_Description   ="HID minidriver (UMDF v2) Installation Disk"
+DeviceDesc         ="Mirabox N4 Codex Micro bridge"
+WudfRdDisplayName  ="Windows Driver Foundation - User-mode Driver Framework Reflector"

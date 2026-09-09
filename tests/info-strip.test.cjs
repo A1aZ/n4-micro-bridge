@@ -1,0 +1,13 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');
+const {defaultConfig,mapN4HardwareEvent}=require('../src/micro-config.cjs');
+const {createN4RenderModel}=require('../src/n4-visuals.cjs');
+test('information strip renders four roles and consumes former shortcut touches',()=>{
+ const c=defaultConfig();c.visual.stripMode='knobs';c.knobs.forEach((k,i)=>k.mode=['micro','scroll','reasoning','brightness'][i]);
+ const model=createN4RenderModel({config:c});
+ for(const code of [0x40,0x41,0x42,0x43])assert.deepEqual(mapN4HardwareEvent(code,1,c),[]);
+ ['导航','聊天滚动','推理强度','亮度'].forEach((label,i)=>assert.ok(model.buttons[10+i].svg.includes(label)));
+ assert.ok(model.buttons[12].svg.includes('待绑定'));assert.ok(!model.buttons[13].svg.includes('100%'));
+ const live=createN4RenderModel({config:c,localActions:{brightness:65,brightnessApplied:true}});
+ assert.ok(live.buttons[13].svg.includes('65%'));
+ c.visual.stripMode='buttons';assert.equal(mapN4HardwareEvent(0x40,1,c)[0].params.k,'ACT10');
+});

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>N4 · 按键对照台</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0d1420;color:#edf3fa;font:15px/1.6 'Microsoft YaHei',sans-serif}main{max-width:1180px;margin:auto;padding:32px 24px}a{color:#8be4cb}h1{font-size:30px;margin:10px 0}p{color:#a8b8ca;margin:6px 0}.top{display:flex;justify-content:space-between;gap:20px;align-items:center}.pill{padding:8px 14px;border:1px solid #40536a;border-radius:30px}.warn{background:#33291b;color:#f0ce8b;border:1px solid #69542d;padding:12px 18px;border-radius:12px;margin:20px 0}.layout{display:grid;grid-template-columns:1.6fr 1fr;gap:24px}.device,.panel{background:#172130;border:1px solid #304158;border-radius:22px;padding:22px}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.key{background:#101823;border:2px solid #33445a;border-radius:12px;padding:7px;text-align:center;min-width:0;transition:background .15s,border-color .15s}.key img{display:block;width:100%;aspect-ratio:1;border-radius:8px}.pos{font-size:12px;color:#a9b9ca}.target{font-size:13px;font-weight:bold}.meaning{font-size:11px;color:#afc1d5}.strip,.knobs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.strip .key{padding:14px 4px}.knobs .key{border-radius:40px;padding:15px 4px}.hit{border-color:#7cffce!important;background:#244a43!important;box-shadow:0 0 0 3px #7cffce33}.seen::after{content:'✓ 已收到';display:block;color:#7cffce;font-size:11px}.panel h2{font-size:18px;margin-top:0}#latest{font-size:24px;color:#8be4cb;margin:12px 0}.detail{white-space:pre-wrap;font-size:14px;color:#c0d0e0}button{background:#283b50;border:1px solid #526981;color:white;padding:9px 14px;border-radius:8px;cursor:pointer}button:hover{background:#36536d}textarea{width:100%;background:#0d1420;color:white;border:1px solid #41546a;border-radius:8px;padding:10px;min-height:76px;margin:12px 0}#history{max-height:260px;overflow:auto;padding-left:22px;color:#b6c8d9;font-size:13px}#history li{margin:10px 0}.small{font-size:12px}.legend{margin:15px 0}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}#connection{max-width:380px;font-size:13px}@media(max-width:850px){.layout{grid-template-columns:1fr}.device{padding:14px}.grid{gap:6px}.top{align-items:flex-start;flex-direction:column}}
+</style>
+<main><div class="top"><div><a href="/real-n4">← 返回设备控制页</a><h1>按一下，就知道对应哪里</h1><p>面对 N4，从上排最左边开始。页面高亮应与手指的位置一致。</p></div><div class="pill" id="connection" role="status">正在连接实时反馈…</div></div>
+<div class="warn">这是旁路观察页，不会主动发送按键，也不会抢占 USB。<strong>实体操作仍会触发 Codex 功能</strong>，请勿在待确认或执行敏感操作的界面测试。</div>
+<div class="layout"><section class="device"><div class="top"><b>Mirabox N4 · 正面</b><span id="progress" class="small">等待操作</span></div><p class="legend small">绿色闪亮 = 刚收到　✓ = 本轮已收到。小图是软件预览，不是设备屏幕回读。</p><div class="grid" id="keys"></div><div class="strip" id="strip"></div><div class="knobs" id="knobs"></div><p class="small" style="margin-top:16px">长条触摸屏在“信息条”模式下不发送快捷键，但触摸报告仍可在这里观察。旋钮按压没有真实长按时长。</p></section>
+<section class="panel"><h2>最近一次操作</h2><div id="latest" aria-live="polite">等你按下实体按钮</div><div id="detail" class="detail">建议先测上排 5 个，再测下排 5 个。</div><div class="toolbar"><button id="clear">重新测试</button><button id="copy">复制测试记录</button></div><label for="note"><p style="margin-top:18px">哪里不一致？记在这里，一起复制给我</p></label><textarea id="note" placeholder="例如：按下排第 3 个，显示 ✓，实际却新建了任务"></textarea><p class="small">图标含义为主题预设，不代表已读取 Codex 内的动作绑定。实际效果请你观察并记录。</p><h2 style="margin-top:22px">操作记录</h2><ol id="history"></ol></section></div></main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),seen=new Set(),rows=[],cards=new Map(),timers=new Map();let config,catalog;
+const modes={micro:'导航',scroll:'聊天滚动',reasoning:'推理强度',brightness:'亮度'};
+const hex=n=>'0x'+Number(n).toString(16).padStart(2,'0');
+function extract(value){
+ if(Number.isInteger(value.hardwareCode))return {code:value.hardwareCode,state:value.state};
+ if(typeof value.hex!=='string')return null;
+ const b=value.hex.trim().split(/\s+/).map(x=>parseInt(x,16));
+ const o=b.length>=512&&b[1]===65&&b[2]===67&&b[3]===75&&b[6]===79&&b[7]===75?1:0;
+ return b.length>=o+11?{code:b[o+9],state:b[o+10]}:null;
+}
+function meaning(target){if(/^AG0[0-5]$/.test(target))return '任务槽 '+(Number(target.slice(2))+1);return catalog.commands[target]?.label||'未分配';}
+function text(parent,cls,value){const el=document.createElement('div');el.className=cls;el.textContent=value;parent.append(el);}
+function render(){
+ cards.clear();for(const id of ['keys','strip','knobs'])$(id).replaceChildren();
+ config.buttons.forEach((b,i)=>{
+  const el=document.createElement('div');el.className='key';cards.set(b.id,el);
+  text(el,'pos',i<10?(i<5?'上排':'下排')+' · '+(i%5+1):'触摸区 '+(i-9));
+  if(i<10){const img=document.createElement('img');img.alt=meaning(b.targetKey);img.src='/api/themes/preview?theme='+encodeURIComponent(config.visual?.theme||'symbols')+'&key='+(i+1);el.append(img);}
+  text(el,'target',i>=10&&config.visual?.stripMode==='knobs'?'信息条':b.targetKey||'—');
+  text(el,'meaning',i>=10&&config.visual?.stripMode==='knobs'?modes[config.knobs[i-10]?.mode]||'导航':meaning(b.targetKey));
+  $(i<10?'keys':'strip').append(el);
+ });
+ config.knobs.forEach((k,i)=>{const el=document.createElement('div');el.className='key';text(el,'target','◉ 旋钮 '+(i+1));text(el,'meaning',modes[k.mode]||'导航');cards.set(k.id,el);$('knobs').append(el);});
+ seen.clear();$('progress').textContent='本轮按钮 0 / 10';
+}
+function receive(value){
+ const raw=extract(value);if(!raw||!config)return;
+ const b=config.buttons.find(x=>x.hardwareCode===raw.code);let id,label;
+ if(b){id=b.id;const i=config.buttons.indexOf(b);label=i<10?(i<5?'上排':'下排')+'第 '+(i%5+1)+' 个按钮':'触摸区 '+(i-9);label+=raw.state===1?' · 按下':' · 状态 '+hex(raw.state);}
+ else {const k=config.knobs.find(x=>Object.values(x.hardware).includes(raw.code));if(k){id=k.id;label='旋钮 '+(config.knobs.indexOf(k)+1)+' · '+(k.hardware.cw===raw.code?'顺时针 ↻':k.hardware.ccw===raw.code?'逆时针 ↺':raw.state===1?'按下':'释放');}else label='未映射输入 '+hex(raw.code);}
+ if(id){const el=cards.get(id);if(el){el.classList.add('hit','seen');seen.add(id);clearTimeout(timers.get(id));timers.set(id,setTimeout(()=>el.classList.remove('hit'),750));}}
+ const emitted=(value.events||[]).map(e=>e.method+' '+JSON.stringify(e.params)).join('\n');
+ const local=(value.localActions||[]).map(a=>'本地动作 '+JSON.stringify(a)).join('\n');
+ const detail='硬件码 '+hex(raw.code)+' · state '+hex(raw.state)+'\n'+(b?'配置目标 '+(b.targetKey||'未分配')+' · 图标预设「'+meaning(b.targetKey)+'」\n':'')+'本次桥接输出：\n'+(emitted||local||'无 Micro 事件（可能为信息条、已停用或尚未绑定）');
+ $('latest').textContent=label;$('detail').textContent=detail;
+ $('progress').textContent='本轮按钮 '+config.buttons.slice(0,10).filter(b=>seen.has(b.id)).length+' / 10';
+ rows.unshift({time:new Date().toLocaleTimeString(),label,detail});if(rows.length>60)rows.pop();
+ $('history').replaceChildren();for(const row of rows){const li=document.createElement('li');li.textContent=row.time+' · '+row.label;$('history').append(li);}
+}
+$('clear').onclick=()=>{rows.length=0;for(const t of timers.values())clearTimeout(t);timers.clear();if(config)render();$('history').replaceChildren();$('latest').textContent='等你按下实体按钮';$('detail').textContent='本轮记录已清空，不影响硬件配置。';};
+$('copy').onclick=async()=>{try {await navigator.clipboard.writeText(JSON.stringify({page:location.origin,note:$('note').value,config,records:rows},null,2));$('copy').textContent='已复制';}catch{$('copy').textContent='复制失败，请允许剪贴板访问';}};
+async function init(){
+ try{const response=await fetch('/api/themes');if(!response.ok)throw Error('无法读取主题');catalog=await response.json();
+ const source=new EventSource('/api/bridge/events');
+ source.addEventListener('state',e=>{const v=JSON.parse(e.data);config=v.config;render();$('connection').textContent='实时监听中 · '+location.host;});
+ source.addEventListener('config',e=>{config=JSON.parse(e.data).config;render();});
+ source.addEventListener('visual',()=>{document.querySelectorAll('#keys img').forEach((img,i)=>{img.src='/api/themes/preview?theme='+encodeURIComponent(config.visual?.theme||'symbols')+'&key='+(i+1)+'&v='+Date.now();});});
+ for(const name of ['report','hardware'])source.addEventListener(name,e=>receive(JSON.parse(e.data)));
+ source.onopen=()=>{$('connection').textContent='实时监听中 · '+location.host;};
+ source.onerror=()=>{$('connection').textContent='连接中断，正在重连；没有亮起不代表硬件故障';};
+ }catch(e){$('connection').textContent=e.message+'，请重启启动器后刷新。';}
+}
+init();
+</script></html>

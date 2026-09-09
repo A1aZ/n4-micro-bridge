@@ -1,0 +1,1356 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mirabox N4 · 设备助手</title>
+  <style>
+    :root{color-scheme:dark;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#10131a;color:#e7eaf0}
+    *{box-sizing:border-box}body{max-width:1180px;margin:0 auto;padding:24px}
+    h1{font-size:24px;margin:0 0 6px}h2{font-size:16px;margin:0 0 8px}
+    p{margin:7px 0}.muted{color:#9ba6b8;font-size:13px}.nav{display:flex;gap:12px;margin:8px 0 18px}.nav a{color:#85b9ff;text-decoration:none}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:#191e27;border:1px solid #303847;border-radius:12px;padding:16px}.wide{grid-column:1/-1}
+    .row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:8px 0}
+    button{background:#263244;color:#fff;border:1px solid #46536a;border-radius:8px;padding:10px 13px;cursor:pointer}button:hover{background:#354967}button.primary{background:#2563a8;border-color:#438fd5}button.danger{background:#5d2930;border-color:#a94b58}
+    input,select{background:#0d1118;color:#fff;border:1px solid #46536a;border-radius:6px;padding:8px;font:inherit}input[type=number]{width:90px}.code{font-family:ui-monospace,monospace;width:75px}
+    .status{padding:9px 11px;background:#101821;border:1px solid #314257;border-radius:7px;color:#b7c8df;min-height:38px}.status.ok{border-color:#2e805c;color:#a8edc9}.status.warn{border-color:#8b6b2d;color:#ffd58a}.status.error{border-color:#a94b58;color:#ffb8c0}
+    .log{height:430px;overflow:auto;background:#080a0e;padding:12px;border-radius:8px;font:12px ui-monospace,monospace;white-space:pre-wrap;word-break:break-word}
+    .pill{display:inline-block;padding:2px 8px;border-radius:20px;background:#28364a;color:#bcd5f5;font-size:11px;margin-right:5px}.hint{color:#b8c4d8;font-size:12px}
+    .bridge-card{border-color:#6a512b;background:#1d1b18}.bridge-card h2{color:#ffd58a}.bridge-card pre{margin:9px 0;max-height:180px;color:#dce6f5}.bridge-card .warning{color:#ffd58a;font-size:12px}.bridge-card a{color:#85b9ff}
+    .native-card{border-color:#66508a;background:#1c1926}.native-card h2{color:#d8b8ff}.native-card pre{margin:9px 0;max-height:230px;color:#dce6f5}.native-card .warning{color:#ffd58a;font-size:12px;margin:9px 0}
+    .sideband-card{border-color:#38577d;background:#151d29}.sideband-card h2{color:#a9d2ff}.sideband-card pre{margin:9px 0;max-height:180px;color:#dce6f5}.sideband-card .warning{color:#ffd58a;font-size:12px;margin:9px 0}
+    .companion-card{border-color:#3d6f68;background:#14201f}.companion-card h2{color:#a9eddf}.companion-card pre{margin:9px 0;max-height:220px;color:#dce6f5}.companion-card .warning{color:#ffd58a;font-size:12px;margin:9px 0}
+    .compat-card{border-color:#6a5b8d;background:#1b1926}.compat-card h2{color:#d9c4ff}.compat-card pre{margin:9px 0;max-height:260px;color:#dce6f5}.compat-card .warning{color:#ffd58a;font-size:12px;margin:9px 0}
+    .controls-card{border-color:#3e6b5b;background:#151e1b}.controls-card h2{color:#a9edc9}.controls-card h3{font-size:14px;margin:14px 0 7px;color:#dce6f5}
+    .control-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:9px}
+    .control-item{background:#101821;border:1px solid #314257;border-radius:8px;padding:10px}.control-item .control-title{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:7px}.control-item .control-title strong{font-size:13px}.control-item .control-title code{color:#9ba6b8;font-size:11px}
+    .control-actions{display:flex;gap:6px;flex-wrap:wrap}.control-actions button{padding:7px 9px;font-size:12px}.control-actions button.press{border-color:#668fca}.control-actions button.release{border-color:#80636a;color:#ffd5dc}.control-actions button.rotate{border-color:#5c8a73}.control-disabled{color:#9ba6b8;font-size:11px;margin-top:6px}
+    .replay-card{border-color:#53658a;background:#171c28}.replay-card h2{color:#b9d2ff}.replay-card textarea{display:block;width:100%;min-height:150px;resize:vertical;background:#080a0e;color:#dce6f5;border:1px solid #46536a;border-radius:8px;padding:11px;font:12px ui-monospace,monospace;line-height:1.45}.replay-card pre{margin:9px 0;max-height:270px;color:#dce6f5}.replay-card .warning{color:#ffd58a;font-size:12px;margin:9px 0}
+    body{max-width:1080px;line-height:1.6}a{color:#95c6ff}button{font:inherit;min-height:44px}button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #8dc5ff;outline-offset:4px}pre{white-space:pre-wrap;overflow:auto;overflow-wrap:anywhere}summary{cursor:pointer;padding:12px 0;font-weight:600}details>section{margin:14px 0}.hero{margin:12px 0 24px}.hero h1{font-size:32px}.eyebrow{color:#8dc5ff;font-size:12px;letter-spacing:2px}.steps{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}.steps a{padding:8px 15px;border:1px solid #36455a;border-radius:24px;text-decoration:none}.guide-card{padding:24px;margin:16px 0;border-radius:16px;background:#191f29;border:1px solid #354255}.guide-card h2{font-size:21px}.step-number{color:#85b9ff;margin-right:10px}.guide-help{color:#b7c5d9;font-size:14px}.notice{border-left:3px solid #d6a85c;background:#28231b;padding:12px 16px;border-radius:6px;color:#f2d3a3}.guide-signal{font-size:17px;padding:14px 0;color:#c6d9ef}.guide-feed{padding:0;list-style:none;max-height:220px;overflow:auto}.guide-feed li{padding:9px 0;border-bottom:1px solid #303c4c}.guide-feed small{color:#a7b7cb;margin-right:12px}.guide-layout{display:grid;grid-template-columns:1.15fr 1fr;gap:24px;align-items:start}.guide-preview{width:100%;aspect-ratio:800/480;border:1px solid #354255;border-radius:12px;background:#10131a}.quiet{color:#a7b7cb;font-size:13px}.advanced-shell{margin-top:28px;border-top:1px solid #354255}.advanced-shell>.grid{margin-top:16px}.guide-demo{border-top:1px solid #354255;margin-top:14px;padding-top:6px}[hidden]{display:none!important}
+    @media(max-width:800px){.grid,.guide-layout{grid-template-columns:1fr}.wide{grid-column:auto}body{padding:14px}.guide-card{padding:18px}.hero h1{font-size:27px}}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <span class="eyebrow">MIRABOX / DEVICE ASSISTANT</span>
+    <h1>把你的 N4 用起来</h1>
+    <p class="guide-help">连接设备，转动旋钮，看看屏幕。无需输入命令，也不用读懂日志。</p>
+    <nav class="steps" aria-label="测试步骤"><a href="#guide-connect">1 · 连接设备</a><a href="#guide-input">2 · 检查输入</a><a href="#guide-screen">3 · 查看屏幕</a><a href="/button-test">按键对照台 →</a></nav>
+    <p class="notice">当前是设备测试版：可以测试 N4 和软件模拟器；尚未完成让 Codex 正式识别为 Micro 的驱动验证。自检通过不等于已连接 Codex。</p>
+  </header>
+  <div id="guide-service" class="status" role="status">正在检查本地服务…</div>
+  <section id="guide-connect" class="guide-card">
+    <h2><span class="step-number">01</span>连接你的设备</h2>
+    <p class="guide-help">先用 USB 连接 N4，并退出 StreamDock（包括系统托盘）。其他网页如果连接了 N4，也请先断开。</p>
+    <div class="row"><button id="guide-start" class="primary" disabled>连接 N4 并启用屏幕</button><button id="guide-stop" disabled>断开本页连接</button><button id="guide-recheck">重新检查</button></div>
+    <p class="quiet">连接会启动本地设备服务，把图像分别写入可视按键和下方长条屏的分区，不会把整张网页预览贴到设备上。不会安装驱动或关闭其他程序。</p>
+    <div id="guide-connection" class="guide-signal" role="status">正在检查设备连接状态…</div>
+    <p id="guide-local-actions" class="quiet" role="status"></p>
+    <details><summary>只测试按键？使用浏览器连接</summary><p class="guide-help">此模式只接收输入，不控制屏幕。选择设备时，名称可能显示为 HOTSPOTEKUSB HID DEMO。两种连接方式不能同时使用。</p><div id="guide-browser-host"></div></details>
+  </section>
+  <section id="guide-input" class="guide-card">
+    <h2><span class="step-number">02</span>按一按，转一转</h2>
+    <p class="guide-help">在实体 N4 上，从左到右转动四个旋钮，再分别按一下。下面会显示收到的操作。</p>
+    <p id="guide-input-status" class="status" role="status">尚未收到操作。连接后，先把最左边的旋钮顺时针转一格。</p>
+    <ul id="guide-feed" class="guide-feed" aria-label="最近收到的操作"><li class="quiet">操作记录会出现在这里（仅显示最近 12 条）。</li></ul>
+    <p class="quiet">旋钮按下后，软件会自动补发释放。当前固件无法提供真实按住时长，因此不能据此判断长按。</p>
+    <details class="guide-demo"><summary>没有设备？试试软件模拟</summary><p class="guide-help">这些操作仅进入软件模拟队列，不代表实体设备已连接，也不代表 Codex 已收到。</p><div class="row"><button id="guide-demo-cw" data-code="A1" data-state="00" disabled>模拟最左旋钮顺时针</button><button id="guide-demo-ccw" data-code="A0" data-state="00" disabled>模拟最左旋钮逆时针</button><button id="guide-demo-press" data-code="37" data-state="01" disabled>模拟最左旋钮按下</button></div></details>
+  </section>
+  <section id="guide-screen" class="guide-card">
+    <p><a href="/screen-test">打开纯色 / 重影检查 →</a></p>
+    <h2><span class="step-number">03</span>看看屏幕效果</h2>
+    <p class="guide-help">Agent 原生状态色：⚪ 白＝空闲 · 🔵 蓝＝工作中 · 🟢 绿＝已完成且有未读更新 · 🟠 琥珀＝需要审批/回复 · 🔴 红＝错误。边框脉动表示选中，不代表运行中。小月牙＝灯光已暗，不能据此判断任务未分配；有保留颜色时沿用该状态的暗色机器人，无颜色时显示中性暗态。状态及未读由 Codex 控制。</p>
+    <div class="guide-layout"><div><p class="guide-help">右侧是软件预览。通过“连接 N4 并启用屏幕”连接后，本地服务会尝试同步到实体设备。</p><p id="guide-screen-status" class="status">尚未确认实体屏幕同步。</p><div class="row"><button id="guide-preview-refresh">刷新预览</button><a href="/visual">打开屏幕效果测试台 →</a></div><p class="quiet">效果测试台中的演示会改变当前视觉状态；设备已连接时，也会同步到 N4。</p><button id="guide-check" disabled>运行软件自检（无需设备）</button><p id="guide-check-status" role="status" class="guide-help">检查模拟器能否回答初始化请求，不会连接 USB 或写入设备。</p></div><iframe id="guide-preview" class="guide-preview" title="N4 软件屏幕预览" loading="lazy" sandbox src="/api/visual/preview"></iframe></div>
+  </section>
+  <details class="advanced-shell" id="advanced-tools"><summary>高级调试 · 原始日志、按键设置与驱动检查</summary>
+  <p class="quiet">日常测试无需修改以下设置。需要排查问题时，可展开查看完整信息。</p>
+  <nav class="nav"><a href="/">协议测试台</a><a href="/visual">视觉监视器</a><a href="/config">配置映射</a></nav>
+
+  <div id="status" class="status">未连接 N4</div>
+  <div id="backend-status" class="status" style="margin-top:8px">正在检查当前 WebUI 实例…</div>
+  <div id="sse-status" class="status" style="margin-top:8px">正在连接输入事件 SSE…</div>
+  <div class="row">
+    <button class="primary" id="connect">连接 N4</button>
+    <button id="disconnect">断开</button>
+    <button id="reset" class="danger">重置桥接状态</button>
+    <label><input id="forward" type="checkbox" checked> 转发到 bridge</label>
+    <span class="pill">VID 0x6602</span><span class="pill">PID 0x1001</span><span class="pill">Usage 0xFFA0</span>
+  </div>
+
+  <section class="card sideband-card">
+    <div class="row" style="justify-content:space-between;margin-top:0">
+      <h2 style="margin:0">虚拟 Codex Micro 驱动检查</h2>
+      <span id="sideband-pill" class="pill">尚未探测</span>
+    </div>
+    <p class="hint">只读检查：枚举虚拟 Micro 的自定义接口并调用 <code>GET_INFO</code>。不会安装驱动、重置队列、发送按键，也不会修改测试签名。请在驱动安装后手动点击。</p>
+    <div class="row">
+      <button id="probe-sideband" class="primary">探测虚拟 Micro（只读）</button>
+      <span id="sideband-status" class="status" style="flex:1">尚未执行探测</span>
+    </div>
+    <p id="sideband-warning" class="warning" hidden></p>
+    <pre id="sideband-details">尚未执行探测</pre>
+  </section>
+
+  <section class="card companion-card">
+    <div class="row" style="justify-content:space-between;margin-top:0">
+      <h2 style="margin:0">Codex Micro Companion HID 预检</h2>
+      <span id="companion-pill" class="pill">尚未探测</span>
+    </div>
+    <p class="hint">只读检查：只调用 <code>hid.enumerate()</code>，确认双 TLC 描述符中的 Usage Page <code>0xFF70</code> / Usage <code>0x0001</code>（Report ID 7）。不会打开设备、读写报告、启动 N4 SDK、安装驱动或修改系统状态。</p>
+    <div class="row">
+      <button id="probe-companion" class="primary">探测 Companion HID（只读）</button>
+      <span id="companion-status" class="status" style="flex:1">尚未执行只读枚举</span>
+    </div>
+    <p id="companion-warning" class="warning" hidden></p>
+    <pre id="companion-details">尚未执行只读枚举</pre>
+  </section>
+
+  <section class="card compat-card">
+    <div class="row" style="justify-content:space-between;margin-top:0">
+      <h2 style="margin:0">Codex Micro 主机握手 / 文件 RPC</h2>
+      <span id="compat-pill" class="pill">尚未测试</span>
+    </div>
+    <p class="hint">完全在 WebUI 内模拟主机初始化：依次发送 <code>sys.version</code>、<code>device.status</code>、<code>fs.list</code>、<code>fs.readbin</code> 和 <code>fs.read</code>，验证默认 keymap、SHA-1、base64 分块和 64 字节报告 framing。不会打开 USB，也不会写入磁盘。</p>
+    <div class="row">
+      <button id="run-compat-handshake" class="primary">运行只读握手</button>
+      <label><input id="compat-keep-queue" type="checkbox"> 保留回复队列</label>
+      <span id="compat-status" class="status" style="flex:1">尚未运行握手</span>
+    </div>
+    <p id="compat-warning" class="warning" hidden></p>
+    <pre id="compat-details">尚未运行。建议先点击“运行只读握手”。</pre>
+  </section>
+
+  <section class="card bridge-card">
+    <h2>物理 N4 原生桥接（与本页二选一）</h2>
+    <p class="warning">当前页面使用浏览器 WebHID。若改用 Python SDK 的实时桥接，请先点击“断开”释放本页的 WebHID lease，再点击下方启动；WebHID 与 hidapi 不能同时打开同一接口。若仍有冲突，页面只会报告，不会抢占。</p>
+    <p class="hint">命令按当前 WebUI 地址生成。页面默认不启动 Python；可以在下方显式启动/停止由本 WebUI 管理的桥接进程。不会安装驱动，也不会抢占或结束外部 StreamDock/桥接进程。</p>
+    <pre id="native-command">正在生成当前页面对应的命令…</pre>
+    <div class="row"><button id="copy-native-command">复制 live 命令</button><a href="/visual">查看视觉/队列监视器</a><a href="/config">查看输入映射</a></div>
+  </section>
+
+  <section class="card native-card">
+    <div class="row" style="justify-content:space-between;margin-top:0">
+      <h2 style="margin:0">Python 原生 N4 桥接状态</h2>
+      <span id="native-pill" class="pill">未启动</span>
+    </div>
+    <p class="hint">这里显示 <code>scripts\n4-webui-bridge.py --live</code> 的心跳、N4 SDK 打开状态、输入计数和屏幕上传计数。SDK 可同时驱动屏幕/按键视觉；hidapi 仅输入，不能写视觉。</p>
+    <div class="row">
+      <label>输入传输
+        <select id="native-transport">
+          <option value="sdk">StreamDock SDK（输入 + 屏幕/按键视觉）</option>
+          <option value="hidapi">hidapi（仅输入，不写视觉）</option>
+        </select>
+      </label>
+      <label><input id="native-visuals" type="checkbox" checked> 启用视觉输出</label>
+      <label>视觉目标
+        <select id="native-visual-target">
+          <option value="both">按键与长条屏（推荐，先清理背景）</option>
+          <option value="screen">整屏调试图（会跨按键显示）</option>
+          <option value="keys">按键与长条屏（不清理背景）</option>
+        </select>
+      </label>
+      <label>输入 profile
+        <select id="native-input-profile">
+          <option value="cpp">CPP</option>
+          <option value="python">Python</option>
+        </select>
+      </label>
+    </div>
+    <div class="row">
+      <button id="start-native" class="primary">启动输入桥接</button>
+      <button id="stop-native" class="danger">停止输入桥接</button>
+      <button id="refresh-native">刷新状态</button>
+      <span id="native-control-status" class="status" style="flex:1">WebUI 未启动原生桥接</span>
+    </div>
+    <p id="native-control-warning" class="warning" hidden></p>
+    <div class="row">
+      <span id="native-status" class="status" style="flex:1">尚未收到原生桥接心跳</span>
+      <span id="native-age" class="pill">无心跳</span>
+    </div>
+    <p id="native-runtime-diagnostics" class="hint">读取线程/心跳线程状态尚未上报</p>
+    <p id="native-owner-hint" class="hint">外部占用进程提示尚未上报</p>
+    <p class="hint">原生桥接进程通过 <code>POST /api/native/state</code> 上报心跳；本页使用 <code>GET /api/native/status</code> 读取带占用冲突诊断的实时状态。</p>
+    <p id="native-warning" class="warning" hidden></p>
+    <pre id="native-details">尚未收到原生桥接状态</pre>
+    <pre id="native-control-details">WebUI 原生桥接控制状态尚未读取</pre>
+  </section>
+
+  <section class="card wide controls-card">
+    <h2><span id="input-profile-title">CPP 输入 profile</span> · 全部实体控件手动调试</h2>
+    <p class="hint">这些按钮直接调用同一个 <code>/api/bridge/hardware</code> 路径，不需要连接 N4。旋钮转动使用 <code>act=2</code>；按压/释放分别使用 <code>state=01/00</code>，可用来确认桥接层是否合成释放事件。</p>
+    <h3>四个物理旋钮</h3>
+    <div id="knob-controls" class="control-grid" aria-label="四个物理旋钮调试"></div>
+    <h3>14 个 N4 按键</h3>
+    <div id="button-controls" class="control-grid" aria-label="十四个 N4 按键调试"></div>
+  </section>
+
+  <section class="card wide replay-card">
+    <h2>原始 N4 报告回放（512 / 513 字节）</h2>
+    <p class="hint">把完整的 N4 HID 十六进制报告粘贴到下面。<strong>仅解码</strong>只调用 <code>/api/raw</code>，不会打开设备或改变 bridge；<strong>解码并转发</strong>才会把同一份报告送入 <code>/api/bridge/report</code>，用于重现按键/旋钮输入。</p>
+    <textarea id="raw-report-input" rows="8" spellcheck="false" placeholder="例如：41 43 4B 00 00 4F 4B 00 00 A1 00 ...（512 字节）；hidapi 也可能是 00 + 上述 512 字节（513 字节）"></textarea>
+    <div class="row">
+      <label>报告 ID <input id="raw-report-id" class="code" type="number" min="0" max="255" step="1" value="0" title="仅作为转发元数据；N4 报告主体通常为 0"></label>
+      <button id="raw-sample-512" type="button">填入 512B CW 样例</button>
+      <button id="raw-sample-513" type="button">填入 513B（前导 ID）样例</button>
+      <button id="raw-decode" type="button" class="primary">仅解码 /api/raw</button>
+      <button id="raw-forward" type="button">解码并转发 bridge</button>
+      <button id="raw-clear" type="button">清空</button>
+    </div>
+    <p id="raw-report-warning" class="warning" hidden></p>
+    <div id="raw-report-status" class="status">尚未回放原始报告</div>
+    <pre id="raw-report-result">尚未执行。建议先点击“填入 513B（前导 ID）样例”，再点“仅解码”。</pre>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>手动注入硬件事件</h2>
+      <p class="hint">实体设备不方便时，可直接用硬件码测试同一条 bridge 路径。<span id="manual-code-hint">旋钮 1：CW=A1、CCW=A0、按压=37。</span></p>
+      <div class="row">
+        <label>硬件码 <input id="code" class="code" value="A1" maxlength="4"></label>
+        <label>状态 <input id="state" class="code" value="01" maxlength="4"></label>
+        <button id="inject">注入</button>
+      </div>
+      <div class="row">
+        <button id="quick-cw" data-code="A1" data-state="00">旋钮1 顺时针</button>
+        <button id="quick-ccw" data-code="A0" data-state="00">旋钮1 逆时针</button>
+        <button id="quick-press" data-code="37" data-state="01">旋钮1 按下</button>
+      </div>
+      <h2>当前桥接快照</h2>
+      <pre id="snapshot" class="log" style="height:150px">正在载入…</pre>
+    </section>
+
+    <section class="card">
+      <h2>设备信息</h2>
+      <pre id="device" class="log" style="height:250px">尚未选择设备</pre>
+      <p class="hint">如果浏览器提示“独占访问”或 Codex 已占用设备，请先关闭占用 N4 的页面/程序。浏览器 WebHID 和原生 hidapi 不能同时打开同一个接口。</p>
+    </section>
+
+    <section class="card wide">
+      <h2>输入、解码和 Micro 事件日志</h2>
+      <div id="log" class="log"></div>
+    </section>
+  </div>
+  </details>
+  <script>
+    (() => {
+      'use strict';
+      const $ = (id) => document.getElementById(id);
+      let dev = null;
+      let source = null;
+      let reportNo = 0;
+
+      // The CPP profile is the input numbering used by the N4 C++ SDK and by
+      // the default bridge configuration. Keep this table next to the manual
+      // controls and decoder so a captured report and a synthetic test use the
+      // same source of truth. The final physical key (0x43) is intentionally
+      // visible even though it has no default Micro target.
+      const CPP_KNOBS = Object.freeze([
+        {index: 1, label: '旋钮 1（最左）', ccw: 0xa0, cw: 0xa1, press: 0x37},
+        {index: 2, label: '旋钮 2', ccw: 0x50, cw: 0x51, press: 0x35},
+        {index: 3, label: '旋钮 3', ccw: 0x90, cw: 0x91, press: 0x33},
+        {index: 4, label: '旋钮 4（最右）', ccw: 0x70, cw: 0x71, press: 0x36},
+      ]);
+      const CPP_BUTTONS = Object.freeze([
+        {index: 1, code: 0x06, targetKey: 'AG00'},
+        {index: 2, code: 0x07, targetKey: 'AG01'},
+        {index: 3, code: 0x08, targetKey: 'AG02'},
+        {index: 4, code: 0x09, targetKey: 'AG03'},
+        {index: 5, code: 0x0a, targetKey: 'AG04'},
+        {index: 6, code: 0x01, targetKey: 'AG05'},
+        {index: 7, code: 0x02, targetKey: 'ACT06'},
+        {index: 8, code: 0x03, targetKey: 'ACT07'},
+        {index: 9, code: 0x04, targetKey: 'ACT08'},
+        {index: 10, code: 0x05, targetKey: 'ACT09'},
+        {index: 11, code: 0x40, targetKey: 'ACT10'},
+        {index: 12, code: 0x41, targetKey: 'ACT11'},
+        {index: 13, code: 0x42, targetKey: 'ACT12'},
+        {index: 14, code: 0x43, targetKey: null},
+      ]);
+      const CPP_BUTTON_BY_CODE = new Map(CPP_BUTTONS.map((button) => [button.code, button]));
+      const KNOB_ROTATE = Object.freeze({
+        0xa0: {knob: 1, direction: 'ccw', key: 'ENC_CC', act: 2, enabled: true},
+        0xa1: {knob: 1, direction: 'cw', key: 'ENC_CW', act: 2, enabled: true},
+        0x50: {knob: 2, direction: 'ccw', key: 'ENC_CC', act: 2, enabled: true},
+        0x51: {knob: 2, direction: 'cw', key: 'ENC_CW', act: 2, enabled: true},
+        0x90: {knob: 3, direction: 'ccw', key: 'ENC_CC', act: 2, enabled: true},
+        0x91: {knob: 3, direction: 'cw', key: 'ENC_CW', act: 2, enabled: true},
+        0x70: {knob: 4, direction: 'ccw', key: 'ENC_CC', act: 2, enabled: true},
+        0x71: {knob: 4, direction: 'cw', key: 'ENC_CW', act: 2, enabled: true},
+      });
+      const KNOB_PRESS = Object.freeze({
+        0x37: {knob: 1, key: 'ENC', enabled: true},
+        0x35: {knob: 2, key: 'ENC', enabled: true},
+        0x33: {knob: 3, key: 'ENC', enabled: true},
+        0x36: {knob: 4, key: 'ENC', enabled: true},
+      });
+      const CPP_SWIPE = Object.freeze({0x38: 'left', 0x39: 'right'});
+      let activeKnobs = CPP_KNOBS.map((knob) => ({...knob, rotateCcw: 'ENC_CC', rotateCw: 'ENC_CW', pressTarget: 'ENC', enabled: true}));
+      let activeButtons = CPP_BUTTONS.map((button) => ({...button, enabled: button.targetKey !== null}));
+      let activeKnobRotate = KNOB_ROTATE;
+      let activeKnobPress = KNOB_PRESS;
+      let activeButtonByCode = CPP_BUTTON_BY_CODE;
+      let activeInputProfile = 'cpp';
+      let forwardChain = Promise.resolve();
+      let webhidLeaseToken = null;
+      let webhidLeaseTimer = null;
+
+      function byteHex(value) { return Number(value).toString(16).padStart(2, '0').toUpperCase(); }
+
+      function esc(value) {
+        return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        }[character]));
+      }
+      function byteOr(value, fallback) {
+        const number = Number(value);
+        return Number.isInteger(number) && number >= 0 && number <= 0xff ? number : fallback;
+      }
+      function textOr(value, fallback) {
+        return typeof value === 'string' && value.trim() ? value : fallback;
+      }
+      function buildDebugMappings(value) {
+        const sourceKnobs = Array.isArray(value?.knobs) && value.knobs.length === CPP_KNOBS.length ? value.knobs : [];
+        const sourceButtons = Array.isArray(value?.buttons) && value.buttons.length === CPP_BUTTONS.length ? value.buttons : [];
+        const knobs = CPP_KNOBS.map((fallback, index) => {
+          const item = sourceKnobs[index] || {};
+          const hardware = item.hardware && typeof item.hardware === 'object' ? item.hardware : {};
+          return {
+            index: index + 1,
+            label: textOr(item.label, fallback.label),
+            ccw: byteOr(hardware.ccw, fallback.ccw),
+            cw: byteOr(hardware.cw, fallback.cw),
+            press: byteOr(hardware.press, fallback.press),
+            rotateCcw: textOr(item.rotateCcw, 'ENC_CC'),
+            rotateCw: textOr(item.rotateCw, 'ENC_CW'),
+            pressTarget: textOr(item.press, 'ENC'),
+            enabled: item.enabled !== false,
+          };
+        });
+        const buttons = CPP_BUTTONS.map((fallback, index) => {
+          const item = sourceButtons[index] || {};
+          return {
+            index: index + 1,
+            code: byteOr(item.hardwareCode, fallback.code),
+            label: textOr(item.label, `N4 按键 ${index + 1}`),
+            targetKey: item.targetKey === null ? null : textOr(item.targetKey, fallback.targetKey),
+            enabled: item.enabled !== false,
+          };
+        });
+        const rotate = {};
+        const press = {};
+        knobs.forEach((knob) => {
+          rotate[knob.ccw] = {knob: knob.index, direction: 'ccw', key: knob.rotateCcw, act: 2, enabled: knob.enabled};
+          rotate[knob.cw] = {knob: knob.index, direction: 'cw', key: knob.rotateCw, act: 2, enabled: knob.enabled};
+          press[knob.press] = {knob: knob.index, key: knob.pressTarget, enabled: knob.enabled};
+        });
+        return {
+          knobs,
+          buttons,
+          rotate,
+          press,
+          buttonByCode: new Map(buttons.map((button) => [button.code, button])),
+          inputProfile: textOr(value?.inputProfile, 'cpp'),
+        };
+      }
+      function applyDebugMappings(value) {
+        const mapped = buildDebugMappings(value);
+        activeKnobs = mapped.knobs;
+        activeButtons = mapped.buttons;
+        activeKnobRotate = mapped.rotate;
+        activeKnobPress = mapped.press;
+        activeButtonByCode = mapped.buttonByCode;
+        activeInputProfile = mapped.inputProfile;
+        const title = $('input-profile-title');
+        if (title) title.textContent = `${activeInputProfile.toUpperCase()} 输入 profile`;
+        const firstKnob = activeKnobs[0];
+        const codeHint = $('manual-code-hint');
+        if (codeHint && firstKnob) {
+          codeHint.textContent = `旋钮 1：CW=${byteHex(firstKnob.cw)}、CCW=${byteHex(firstKnob.ccw)}、按压=${byteHex(firstKnob.press)}。`;
+        }
+        if (firstKnob) {
+          const quick = [
+            ['quick-cw', firstKnob.cw, '旋钮1 顺时针'],
+            ['quick-ccw', firstKnob.ccw, '旋钮1 逆时针'],
+            ['quick-press', firstKnob.press, '旋钮1 按下'],
+          ];
+          for (const [id, code, label] of quick) {
+            const button = $(id);
+            if (!button) continue;
+            button.dataset.code = byteHex(code);
+            button.textContent = `${label} (0x${byteHex(code)})`;
+          }
+        }
+        renderManualControls();
+        bindManualControls();
+        const first = activeKnobs[0];
+        if (first) {
+          $('guide-demo-cw').dataset.code = byteHex(first.cw);
+          $('guide-demo-ccw').dataset.code = byteHex(first.ccw);
+          $('guide-demo-press').dataset.code = byteHex(first.press);
+        }
+      }
+      function renderManualControls() {
+        const knobHost = $('knob-controls');
+        const buttonHost = $('button-controls');
+        if (!knobHost || !buttonHost) return;
+        const action = (code, state, label, className='') =>
+          `<button type="button" class="${className}" data-code="${byteHex(code)}" data-state="${byteHex(state)}">${label} <code>0x${byteHex(code)}</code></button>`;
+         knobHost.innerHTML = activeKnobs.map((knob) => `
+           <article class="control-item">
+            <div class="control-title"><strong>${esc(knob.label)}</strong><code>按压 0x${byteHex(knob.press)}</code></div>
+            <div class="control-actions">
+              ${action(knob.ccw, 0, '↺ 逆时针', 'rotate')}
+              ${action(knob.cw, 0, '↻ 顺时针', 'rotate')}
+              ${action(knob.press, 1, '按下', 'press')}
+              ${action(knob.press, 0, '释放', 'release')}
+            </div>
+            <div class="control-disabled">桥接映射：${knob.enabled ? '已启用' : '已禁用'}</div>
+          </article>`).join('');
+        buttonHost.innerHTML = activeButtons.map((button) => `
+           <article class="control-item">
+            <div class="control-title"><strong>${esc(button.label || `N4 按键 ${button.index}`)}</strong><code>0x${byteHex(button.code)}</code></div>
+            <div class="control-actions">
+              ${action(button.code, 1, '按下', 'press')}
+              ${action(button.code, 0, '释放', 'release')}
+            </div>
+            <div class="control-disabled">Micro 目标：${esc(button.targetKey || '未映射（诊断仍可用）')} · 桥接映射：${button.enabled ? '已启用' : '已禁用'}</div>
+          </article>`).join('');
+      }
+      function bindManualControls() {
+        document.querySelectorAll('[data-code]').forEach((button) => {
+          button.onclick = () => inject(button.dataset.code, button.dataset.state);
+        });
+      }
+
+      function print(value) {
+        const line = (new Date()).toLocaleTimeString() + '  ' +
+          (typeof value === 'string' ? value : JSON.stringify(value));
+        $('log').textContent = ($('log').textContent + line + '\n').slice(-120000);
+        $('log').scrollTop = $('log').scrollHeight;
+      }
+      let guideBackendReady = false, guideBusy = false, guideInputCount = 0;
+      let guideNative = {}, guideControl = {}, guideConflicts = [], guideFailure = '';
+      function updateGuideConnection() {
+        const connected = Boolean(dev?.opened);
+        const nativeReady = Boolean(guideNative.n4?.ready && guideNative.n4?.opened && !guideNative.stale && guideNative.status === 'running');
+        const running = Boolean(guideControl.managed && ['starting','running','stopping'].includes(guideControl.status));
+        $('guide-start').disabled = !guideBackendReady || guideBusy || connected || running || nativeReady;
+        $('guide-stop').disabled = guideBusy || !(connected || running);
+        $('connect').disabled = !guideBackendReady || guideBusy || connected || running || nativeReady;
+        $('disconnect').disabled = !connected || guideBusy;
+        $('guide-check').disabled = !guideBackendReady || guideBusy;
+        for (const id of ['guide-demo-cw','guide-demo-ccw','guide-demo-press']) $(''+id).disabled = !guideBackendReady || guideBusy;
+        let message = '尚未连接。准备好后，点击“连接 N4 并启用屏幕”。';
+        if (guideFailure) message = guideFailure;
+        else if (guideBusy) message = '正在处理，请稍候…';
+        else if (guideNative.stale && guideNative.status === 'running') message = '设备服务已失去响应。请重新检查连接；若由本页启动，可先断开再连接。';
+        else if (nativeReady) message = '设备已连接。现在可以转动旋钮、按下按键。';
+        else if (connected) message = '浏览器已连接 N4（仅输入）。现在可以测试按键和旋钮。';
+        else if (running) message = '本地设备服务正在运行，等待 N4 就绪…';
+        else if (guideConflicts.length) message = '发现其他程序或页面可能正在使用 N4。请退出 StreamDock、断开其他 N4 页面，再点击“重新检查”。不会自动关闭它们。';
+        else if (guideNative.status === 'error') message = '设备服务未能连接。请确认 USB 已插好、StreamDock 已退出，再重试；详细原因见高级调试。';
+        $('guide-connection').textContent = message;
+        $('guide-local-actions').textContent = guideNative.n4?.localActions?.lastReason || '';
+        const visual = guideNative.visual || {};
+        $('guide-screen-status').textContent = nativeReady && visual.enabled
+          ? (visual.lastError || visual.lastPollError || visual.errors
+            ? '屏幕同步曾出现错误，请查看设备；详细信息在高级调试中。'
+            : Number(visual.uploads) > 0
+              ? `设备服务已报告 ${visual.uploads} 次图像上传。请目视确认 N4 屏幕是否显示正确。`
+              : '设备已连接，正在等待首次图像上传。')
+          : '仅软件预览 · 尚未确认实体屏幕同步。';
+      }
+      function guideInput(eventName, value) {
+        let code = value.hardwareCode, state = value.state;
+        if (eventName === 'report') {
+          const bytes = parseRawReport(value.hex).bytes;
+          const offset = n4ReportOffset(bytes);
+          code = bytes[offset + 9]; state = bytes[offset + 10];
+        }
+        const rotation = activeKnobRotate[code], press = activeKnobPress[code], button = activeButtonByCode.get(code);
+        let label;
+        if (rotation) label = `旋钮 ${rotation.knob} · ${rotation.direction === 'cw' ? '顺时针' : '逆时针'}转动`;
+        else if (press) label = `旋钮 ${press.knob} · ${Number(state) === 1 ? '按下' : '释放'}`;
+        else if (button) label = `${button.label || `按键 ${button.index}`} · ${Number(state) === 1 ? '按下' : '释放'}`;
+        else return;
+        const origin = eventName === 'hardware' ? '软件模拟' : '报告输入（设备或回放）';
+        const mapped = Array.isArray(value.events) && value.events.length > 0;
+        const action=value.localActions?.[0];
+        const detail=action?(action.type==='setup-required'?'推理旋钮等待 Codex 左右方向绑定':action.type==='brightness'?'已分配 N4 亮度调整（由实体进程执行）':'已分配本地滚动（仅实体进程执行，需鼠标位于聊天区）'):mapped?'已转换为 Micro 事件（尚未确认 Codex 接收）':'已收到，当前未映射到 Micro 动作';
+        $('guide-input-status').textContent = `${origin}：${label} · ${detail}`;
+        const feed = $('guide-feed');
+        if (guideInputCount++ === 0) feed.replaceChildren();
+        const item = document.createElement('li'), time = document.createElement('small');
+        time.textContent = new Date().toLocaleTimeString();
+        item.append(time, document.createTextNode(`${origin} · ${label}`)); feed.prepend(item);
+        while (feed.children.length > 12) feed.lastElementChild.remove();
+      }
+      async function guideAction(action) {
+        if (guideBusy) return;
+        guideBusy = true; guideFailure = ''; updateGuideConnection();
+        try { await action(); }
+        catch (error) { guideFailure = '操作未完成，请重新检查连接。详细原因见高级调试。'; print({error:error.message}); }
+        finally { guideBusy = false; updateGuideConnection(); }
+      }
+      async function refreshGuidePreview() {
+        const button = $('guide-preview-refresh'); button.disabled = true;
+        try {
+          const value = await jsonFetch('/api/visual/state');
+          if (!value.model?.screen?.svg) throw new Error('missing screen');
+          $('guide-preview').srcdoc = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>N4 软件屏幕预览</title><style>body{margin:0;background:#10131a}svg{display:block;width:100%;height:auto}</style><body>' + value.model.screen.svg + '</body></html>';
+          button.textContent = '刷新预览';
+        } catch (error) { button.textContent = '预览加载失败，点击重试'; print({error:'预览加载失败',message:error.message}); }
+        finally { button.disabled = false; }
+      }
+      function setupGuide() {
+        const browserRow = $('connect').parentElement;
+        $('guide-browser-host').append($('status'), browserRow);
+        const extra = document.createElement('details'), summary = document.createElement('summary');
+        summary.textContent = '浏览器转发选项'; extra.append(summary);
+        extra.append($('reset'), $('forward').parentElement);
+        browserRow.querySelectorAll('.pill').forEach((pill) => extra.append(pill));
+        $('advanced-tools').append(extra);
+        $('guide-start').onclick = () => guideAction(async () => {
+          $('native-transport').value = 'sdk'; $('native-visuals').checked = true;
+          $('native-visual-target').value = 'both'; updateNativeTransportControls(); await startNativeBridge();
+        });
+        $('guide-stop').onclick = () => guideAction(async () => { if (dev) await disconnect(); else await stopNativeBridge(); });
+        $('guide-recheck').onclick = () => guideAction(async () => { await refreshBackendStatus(); await refreshNativeBridgeState(); });
+        $('guide-check').onclick = () => guideAction(runCompatHandshake);
+        $('guide-preview-refresh').onclick = refreshGuidePreview;
+        void refreshGuidePreview();
+      }
+      function setStatus(message, kind='') { $('status').textContent = message; $('status').className = 'status ' + kind; }
+      function setBackendStatus(message, kind='') { $('backend-status').textContent = message; $('backend-status').className = 'status ' + kind; }
+      const sidebandLabels = {
+        'not-probed': ['尚未探测', ''],
+        probing: ['探测中…', ''],
+        compatible: ['兼容', 'ok'],
+        'interface-not-found': ['未发现接口', 'error'],
+        'access-denied': ['权限不足', 'error'],
+        'identity-mismatch': ['身份不匹配', 'error'],
+        timeout: ['超时', 'error'],
+        'unsupported-platform': ['平台不支持', 'error'],
+        'python-unavailable': ['找不到 Python', 'error'],
+        'probe-error': ['探测错误', 'error'],
+        error: ['错误', 'error'],
+      };
+      const companionLabels = {
+        'not-probed': ['尚未探测', ''],
+        probing: ['探测中…', ''],
+        compatible: ['已发现', 'ok'],
+        'path-unavailable': ['无可用路径', 'warn'],
+        'interface-not-found': ['未发现 Companion', 'warn'],
+        'hidapi-unavailable': ['hidapi 不可用', 'error'],
+        'enumeration-error': ['枚举错误', 'error'],
+        'invalid-arguments': ['参数错误', 'error'],
+        'python-unavailable': ['找不到 Python', 'error'],
+        timeout: ['超时', 'error'],
+        'probe-error': ['探测错误', 'error'],
+        error: ['错误', 'error'],
+      };
+      const nativeLabels = {
+        'not-running': ['未启动', ''],
+        starting: ['启动中…', ''],
+        opening: ['正在打开 N4…', ''],
+        running: ['运行中', 'ok'],
+        stopping: ['正在停止…', 'warn'],
+        stopped: ['已停止', 'warn'],
+        error: ['错误', 'error'],
+      };
+      function renderSideband(value) {
+        if (!value || typeof value !== 'object') return;
+        let [label, kind] = sidebandLabels[value.status] || [value.status || '未知', 'error'];
+        if (value.status === 'compatible' && value.operational === false) {
+          label = '仅合同·未验证';
+          kind = 'warn';
+        }
+        $('sideband-pill').textContent = label;
+        $('sideband-status').textContent = value.message || label;
+        $('sideband-status').className = 'status ' + kind;
+        const warning = $('sideband-warning');
+        const architectureWarning = value.architectureWarning || '';
+        warning.textContent = architectureWarning;
+        warning.hidden = !architectureWarning;
+        const details = {
+          status: value.status,
+          ok: Boolean(value.ok),
+          architecture: value.architecture || null,
+          operational: value.operational === undefined ? null : Boolean(value.operational),
+          architectureWarning: architectureWarning || null,
+          interfaceFound: Boolean(value.interfaceFound),
+          identityCompatible: Boolean(value.identityCompatible),
+          info: value.info || null,
+          compatibilityErrors: value.compatibilityErrors || [],
+          path: value.path || null,
+          checkedAt: value.checkedAt || null,
+          driverTouched: Boolean(value.driverTouched),
+        };
+        $('sideband-details').textContent = JSON.stringify(details, null, 2);
+      }
+      function renderCompanion(value) {
+        if (!value || typeof value !== 'object') return;
+        const [label, kind] = companionLabels[value.status] || [value.status || '未知', 'error'];
+        $('companion-pill').textContent = label;
+        $('companion-status').textContent = value.message || label;
+        $('companion-status').className = 'status ' + kind;
+        const warning = $('companion-warning');
+        const warningText = value.status === 'compatible'
+          ? '已找到匹配的 Companion HID 枚举项；这是只读预检，尚未打开设备，也不代表驱动输入/输出链路已经完成验证。'
+          : (value.status === 'interface-not-found'
+            ? '当前 hidapi 枚举中没有匹配的 0xFF70 Companion TLC；这通常表示驱动尚未安装，或描述符/Report ID 仍需检查。'
+            : (value.status === 'hidapi-unavailable'
+              ? '当前 Python 缺少 hid 模块。先执行 python -m pip install hidapi；这只安装用户态 Python 包，不会安装或修改设备驱动。'
+              : ''));
+        warning.textContent = warningText;
+        warning.hidden = !warningText;
+        const details = {
+          status: value.status,
+          ok: Boolean(value.ok),
+          expected: value.expected || null,
+          enumerated: Boolean(value.enumerated),
+          hidapiAvailable: Boolean(value.hidapiAvailable),
+          interfaceFound: Boolean(value.interfaceFound),
+          identityCompatible: Boolean(value.identityCompatible),
+          pathReady: Boolean(value.pathReady),
+          candidateCount: value.candidateCount ?? 0,
+          matchCount: value.matchCount ?? 0,
+          paths: value.paths || [],
+          path: value.path || null,
+          matches: value.matches || [],
+          checkedAt: value.checkedAt || null,
+          diagnosticError: value.error || null,
+          opened: Boolean(value.opened),
+          driverTouched: Boolean(value.driverTouched),
+        };
+        $('companion-details').textContent = JSON.stringify(details, null, 2);
+      }
+      function renderCompat(value) {
+        if (value.mode !== 'compatibility-state') {
+          $('guide-check-status').textContent = value.ok && value.checks?.replyCount === 5
+            ? '软件自检通过：5 项初始化请求均已回复。这不代表实体 N4 或 Codex 已连接。'
+            : value.checks ? '软件自检未通过。请在高级调试中查看失败项。' : '尚未运行软件自检。';
+        }
+        if (!value || typeof value !== 'object') return;
+        const ok = value.ok === true;
+        const checks = value.checks || {};
+        const warning = [];
+        if (value.mode === 'compatibility-state') {
+          $('compat-pill').textContent = '就绪';
+          $('compat-status').textContent = `文件状态 · ${(value.files?.files || []).length} 个文件`;
+          $('compat-status').className = 'status';
+        } else {
+          $('compat-pill').textContent = ok ? '通过' : (value.status || '失败');
+          $('compat-status').textContent = ok
+            ? `握手通过 · ${value.checks?.replyCount ?? 0}/${value.checks?.expectedReplyCount ?? 0} 个回复`
+            : (value.message || '握手未通过');
+          $('compat-status').className = 'status ' + (ok ? 'ok' : 'error');
+          if (!checks.keymapListed) warning.push('fs.list 未列出 keymap.json');
+          if (!checks.keymapReadAsObject) warning.push('fs.read 未返回 JSON 对象');
+        }
+        $('compat-warning').textContent = warning.join('；');
+        $('compat-warning').hidden = warning.length === 0;
+        $('compat-details').textContent = JSON.stringify({
+          mode: value.mode || null,
+          ok,
+          checks,
+          files: value.files || null,
+          requestCount: Array.isArray(value.requests) ? value.requests.length : 0,
+          requestReports: Array.isArray(value.requestReports) ? value.requestReports.length : 0,
+          replyCount: Array.isArray(value.replies) ? value.replies.length : 0,
+          replyReports: Array.isArray(value.replyReports) ? value.replyReports.length : 0,
+          drainedReports: Array.isArray(value.drained) ? value.drained.length : 0,
+          transport: value.transport || null,
+        }, null, 2);
+      }
+      async function runCompatHandshake() {
+        $('guide-check-status').textContent = '正在进行软件自检…';
+        const button = $('run-compat-handshake');
+        button.disabled = true;
+        $('compat-status').textContent = '正在通过同一条 Micro framing 路径测试…';
+        $('compat-status').className = 'status';
+        try {
+          const value = await jsonFetch('/api/compat/handshake', {
+            method: 'POST',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify({drain: !$('compat-keep-queue').checked}),
+          });
+          renderCompat(value);
+          print({compatibilityHandshake: value});
+        } catch (error) {
+          renderCompat({ok: false, message: error.message});
+          $('guide-check-status').textContent = '自检未完成：本地服务不可用或版本过旧，请点击“重新检查”。';
+          print({error: 'Codex Micro 握手失败', message: error.message});
+        } finally { button.disabled = false; }
+      }
+      function renderNativeBridge(value) {
+        if (!value || typeof value !== 'object') return;
+        const native = value.nativeBridge && typeof value.nativeBridge === 'object' ? value.nativeBridge : value;
+        const control = value.control && typeof value.control === 'object'
+          ? value.control
+          : (value.nativeControl && typeof value.nativeControl === 'object' ? value.nativeControl : null);
+        guideNative = native; guideControl = control || {};
+        guideConflicts = control?.conflicts || value.conflicts || [];
+        updateGuideConnection();
+        let [label, kind] = nativeLabels[native.status] || [native.status || '未知', 'error'];
+        const stale = Boolean(native.stale);
+        if (stale && native.status === 'running') {
+          label = '心跳已过期';
+          kind = 'warn';
+        }
+        $('native-pill').textContent = label;
+        $('native-status').textContent = native.message || label;
+        $('native-status').className = 'status ' + kind;
+        const age = Number(native.ageMs);
+        const legacyAgeAvailable = value.ageMs != null && Number.isFinite(age);
+        $('native-age').textContent = legacyAgeAvailable || (native.ageMs != null && Number.isFinite(age))
+          ? (age < 1000 ? `${Math.max(0, Math.round(age))} ms 前` : `${(age / 1000).toFixed(1)} s 前`)
+          : '无心跳';
+        const warning = $('native-warning');
+        const warningText = native.status === 'not-running'
+          ? '尚未启动原生桥接；当前页面仍可用 WebHID 或手动注入测试。'
+          : (native.visual?.lastPollError
+            ? `视觉状态轮询错误：${native.visual.lastPollError}`
+            : (stale ? '最近一次心跳超过 3.5 秒；请检查终端里的 Python 进程和 N4 占用状态。' : ''));
+        warning.textContent = warningText;
+        warning.hidden = !warningText;
+        const details = {
+          status: native.status,
+          message: native.message || null,
+          pid: native.pid ?? null,
+          startedAt: native.startedAt || null,
+          lastSeenAt: native.lastSeenAt || null,
+          stale,
+          ageMs: native.ageMs ?? null,
+          webuiUrl: native.webuiUrl || null,
+          n4: native.n4 || null,
+          counters: native.counters || null,
+          visual: native.visual || null,
+          lastError: native.lastError || null,
+        };
+        $('native-details').textContent = JSON.stringify(details, null, 2);
+        const reader = native.n4?.reader || {};
+        const heartbeat = native.n4?.heartbeat || {};
+        const yesNo = (flag) => flag ? '是' : '否';
+        const n4 = native.n4 || {};
+        const transportDetails = n4.transportDetails || {};
+        const ownerHints = n4.externalOwnerHints || value.externalOwnerHints || null;
+        const transportLabel = n4.transport || 'unknown';
+        const reportSize = transportDetails.inputReportSize ?? n4.reportLength ?? '—';
+        const transportError = transportDetails.lastError || n4.lastError || '';
+        $('native-runtime-diagnostics').textContent = `传输=${transportLabel} · 打开方式=${n4.openMode || '—'} · 输入报告=${reportSize}B · 读取线程=${yesNo(reader.threadAlive)} · runFlag=${yesNo(reader.runFlag)} · raw callback=${yesNo(reader.rawCallbackRegistered)} · 心跳线程=${yesNo(heartbeat.threadAlive)} · 心跳 runFlag=${yesNo(heartbeat.runFlag)}${transportError ? ` · 错误=${transportError}` : ''}`;
+        if (ownerHints && typeof ownerHints === 'object') {
+          const processes = Array.isArray(ownerHints.processes) ? ownerHints.processes : [];
+          const processText = processes.length
+            ? processes.map((item) => `${item.name || '未知进程'}${item.pid ? ` (PID ${item.pid})` : ''}`).join('、')
+            : '无已知进程';
+          $('native-owner-hint').textContent = `外部占用提示：${ownerHints.message || ownerHints.status || '未知'} · ${processText} · 仅进程存在提示，未确认内核句柄归属`;
+          $('native-owner-hint').className = ownerHints.suspected ? 'warning' : 'hint';
+        } else {
+          $('native-owner-hint').textContent = '外部占用进程提示尚未上报';
+          $('native-owner-hint').className = 'hint';
+        }
+        if (control) {
+          const controlLabel = nativeLabels[control.status]?.[0] || control.status || '未知';
+          $('native-control-status').textContent = control.managed
+            ? `WebUI 管理进程：${controlLabel}${control.pid ? `（PID ${control.pid}）` : ''}`
+            : (control.message || (control.status === 'stopped' ? 'WebUI 原生桥接已停止' : 'WebUI 未管理原生桥接进程'));
+          const conflicts = Array.isArray(control.conflicts) ? control.conflicts : (value.conflicts || []);
+          const conflictText = conflicts.length
+            ? `检测到 ${conflicts.length} 个潜在占用：${conflicts.map((item) => `${item.kind}${item.pid ? ` PID ${item.pid}` : ''} — ${item.reason || item.command || ''}`).join('；')}`
+            : '';
+          $('native-control-warning').textContent = conflictText;
+          $('native-control-warning').hidden = !conflictText;
+          $('native-control-details').textContent = JSON.stringify({
+            status: control.status,
+            managed: Boolean(control.managed),
+            pid: control.pid ?? null,
+            transport: control.transport || null,
+            visuals: Boolean(control.visuals),
+            visualTarget: control.visualTarget || null,
+            inputProfile: control.inputProfile || null,
+            command: control.command || null,
+            startedAt: control.startedAt || null,
+            stoppedAt: control.stoppedAt || null,
+            exitCode: control.exitCode ?? null,
+            signal: control.signal || null,
+            outputTail: control.outputTail || '',
+            lastError: control.lastError || null,
+            conflicts,
+            webhidLease: value.webhidLease || null,
+          }, null, 2);
+          const transportSelect = $('native-transport');
+          const visualsCheck = $('native-visuals');
+          const targetSelect = $('native-visual-target');
+          const profileSelect = $('native-input-profile');
+          if (control.transport && !control.managed) transportSelect.value = control.transport;
+          if (control.visualTarget && !control.managed) targetSelect.value = control.visualTarget;
+          if (control.inputProfile && !control.managed) profileSelect.value = control.inputProfile;
+          if (typeof control.visuals === 'boolean' && !control.managed) visualsCheck.checked = control.visuals;
+        }
+      }
+      function formatHex(value, width=4) {
+        const number = Number(value);
+        return Number.isFinite(number) ? '0x' + number.toString(16).padStart(width, '0').toUpperCase() : '—';
+      }
+      function renderBackendStatus(value) {
+        const missing = [];
+        const server = value && value.server;
+        const features = value && value.features;
+        if (!server || server.schema !== 'mirabox.codex.micro.webui' || Number(server.apiVersion) < 2) missing.push('server API v2');
+        if (!value || !value.bridge) missing.push('bridge');
+        if (!value || !value.transport) missing.push('transport');
+        if (!value || !value.visual) missing.push('visual');
+        const featureLevel = (name) => {
+          const advertised = features?.[name];
+          if (advertised === true) return 1;
+          const level = Number(advertised);
+          return Number.isFinite(level) ? level : 0;
+        };
+        for (const feature of ['bridgeApi','transportApi','visualApi','eventStream','dynamicInputMapping','nativeBridgeStatus','nativeBridgeControl','nativeOwnerHints','webhidLease','companionProbe','microFsRpc','compatibilityHandshake','independentKnobs','informationStrip']) {
+          if (featureLevel(feature) < 1) missing.push(`feature:${feature}`);
+        }
+        if (missing.length) {
+          guideBackendReady = false;
+          $('guide-service').textContent = '这个地址的后台版本较旧，部分按钮暂不可用。请让协助者重启此地址的服务，再点击“重新检查”。刷新网页本身无法升级后台。';
+          $('guide-service').className = 'status warn'; updateGuideConnection();
+          setBackendStatus(`当前实例 ${window.location.origin} 是旧进程或能力不完整：缺少 ${missing.join('、')}。页面文件可能已更新，但 Node 后端仍需重启；本页不会自动切换端口。`, 'error');
+          return;
+        }
+        const identity = value.identity || {};
+        guideBackendReady = true;
+        $('guide-service').textContent = `本地服务已就绪 · 当前地址 ${window.location.origin} · 设备助手`;
+        $('guide-service').className = 'status ok'; updateGuideConnection();
+        const bridge = value.bridge || {};
+        const stats = bridge.stats || {};
+        const cfg = bridge.config || value.config || {};
+        if (cfg && typeof cfg === 'object') applyDebugMappings(cfg);
+        const transport = value.transport || {};
+        setBackendStatus(`后端 ${window.location.origin} · build ${server.buildId || 'unknown'} · PID ${server.pid ?? '—'} · Micro ${formatHex(identity.vendorId)}:${formatHex(identity.productId)} · profile ${cfg.inputProfile || 'default'} · 队列 ${transport.queuedInputReports ?? 0} · 已解码 ${stats.reports ?? 0} 条`, 'ok');
+      }
+      function setupNativeBridgeHelp() {
+        const base = /^https?:$/.test(window.location.protocol) ? window.location.origin : 'http://127.0.0.1:8787';
+        // The project environment is the known-good one on this checkout:
+        // it contains hidapi and Pillow, while an arbitrary PATH Python may
+        // be a different virtualenv. Keep a generic fallback visible for
+        // installations that do not have the local environment.
+        const projectPython = `.\\.hidapi-venv\\Scripts\\python.exe`;
+        const fallbackPython = 'python';
+        const liveArgs = `scripts\\n4-webui-bridge.py --live --webui-url ${base} --sdk-path upstream\\StreamDock-Device-SDK\\Python-SDK\\src --poll-ms 500 --visual-refresh-ms 250`;
+        const checkArgs = `scripts\\n4-webui-bridge.py --check-only --webui-url ${base}`;
+        const live = `${projectPython} ${liveArgs}`;
+        const fallbackLive = `${fallbackPython} ${liveArgs}`;
+        const check = `${projectPython} ${checkArgs}`;
+        const fallbackCheck = `${fallbackPython} ${checkArgs}`;
+        $('native-command').textContent = `推荐（项目环境，含 hidapi/Pillow）：\n安全检查（不打开 N4）：\n${check}\n\n实体 N4 实时桥接（关闭本页 WebHID 后手动执行）：\n${live}\n\n如果项目环境不存在，可退回 PATH Python（可能缺少 hidapi/Pillow）：\n${fallbackCheck}\n${fallbackLive}`;
+        $('copy-native-command').onclick = async () => {
+          try { await navigator.clipboard.writeText(live); setStatus('live 命令已复制；请确认本页已断开并关闭后再执行。', 'ok'); }
+          catch (error) { print({error:'复制命令失败',message:error.message}); setStatus('复制失败：' + error.message, 'error'); }
+        };
+      }
+      function hex(value) { return [...new Uint8Array(value)].map((x) => x.toString(16).padStart(2,'0')).join(' '); }
+      function bytesFromDataView(data) { return new Uint8Array(data.buffer, data.byteOffset, data.byteLength); }
+      function n4ReportOffset(bytes) {
+        // hidapi may expose a leading report-ID byte (513 bytes total), while
+        // WebHID's data view normally starts at the vendor packet itself.
+        // Only accept the prefix when the full N4 ACK/OK signature is at
+        // offset 1; this keeps short/synthetic diagnostics at offset 0.
+        return bytes.length >= 512
+          && bytes[1] === 0x41 && bytes[2] === 0x43 && bytes[3] === 0x4b
+          && bytes[6] === 0x4f && bytes[7] === 0x4b
+          ? 1 : 0;
+      }
+      function parseRawReport(value) {
+        const source = String(value ?? '').trim();
+        if (!source) throw new Error('请先粘贴 N4 原始十六进制报告');
+        // Accept the formats commonly copied from WebHID/hidapi logs:
+        // whitespace-separated bytes, comma/colon-separated bytes, and
+        // optional 0x prefixes. Keep parsing strict so a pasted label or a
+        // truncated report cannot silently turn into a different packet.
+        const compact = source
+          .replace(/0x/gi, '')
+          .replace(/[\s,;:_\-\[\]{}()"'<>]/g, '');
+        if (!compact || !/^[0-9a-f]+$/i.test(compact) || compact.length % 2) {
+          throw new Error('原始报告必须是连续的十六进制字节（可用空格或 0x 分隔）');
+        }
+        const pairs = compact.match(/[0-9a-f]{2}/gi) || [];
+        const bytes = pairs.map((pair) => parseInt(pair, 16));
+        if (bytes.length !== 512 && bytes.length !== 513) {
+          throw new Error(`原始 N4 报告应为 512 或 513 字节，当前为 ${bytes.length} 字节`);
+        }
+        const array = Uint8Array.from(bytes);
+        return {
+          bytes,
+          length: bytes.length,
+          offset: n4ReportOffset(array),
+          hex: hex(array),
+        };
+      }
+      function buildRawSample(withReportId = false) {
+        const bytes = new Uint8Array(withReportId ? 513 : 512);
+        const offset = withReportId ? 1 : 0;
+        bytes.set([0x41, 0x43, 0x4b, 0x00, 0x00, 0x4f, 0x4b], offset);
+        bytes[offset + 9] = 0xa1; // 旋钮 1 顺时针
+        bytes[offset + 10] = 0x00;
+        return hex(bytes);
+      }
+      function setRawStatus(message, kind = '') {
+        $('raw-report-status').textContent = message;
+        $('raw-report-status').className = 'status ' + kind;
+      }
+      function setRawWarning(message = '') {
+        const warning = $('raw-report-warning');
+        warning.textContent = message;
+        warning.hidden = !message;
+      }
+      function rawReplaySummary(result, parsed, action) {
+        const raw = result.raw || result;
+        const sdkEvent = raw.sdkEvent || null;
+        const configuredEvents = Array.isArray(raw.configuredEvents) ? raw.configuredEvents : [];
+        const bridge = result.bridge || null;
+        return {
+          action,
+          inputLength: parsed.length,
+          reportOffset: parsed.offset,
+          normalizedLength: parsed.length - parsed.offset,
+          reportId: result.reportId ?? 0,
+          sdkEvent,
+          configuredEvents,
+          bridge: bridge ? {
+            events: bridge.events || [],
+            wireReports: bridge.wireReports || [],
+            bridgeStats: bridge.bridge || null,
+            transport: bridge.transport || null,
+          } : null,
+          hexHead: parsed.hex.split(' ').slice(0, 16).join(' '),
+          hexTail: parsed.hex.split(' ').slice(-16).join(' '),
+        };
+      }
+      function renderRawReplay(result, parsed, action) {
+        const summary = rawReplaySummary(result, parsed, action);
+        $('raw-report-result').textContent = JSON.stringify(summary, null, 2);
+        const eventCount = summary.bridge
+          ? (Array.isArray(summary.bridge.events) ? summary.bridge.events.length : 0)
+          : (Array.isArray(summary.configuredEvents) ? summary.configuredEvents.length : 0);
+        const mode = action === 'forward' ? '已解码并转发 bridge' : '已调用 /api/raw（只读）';
+        setRawStatus(`${mode} · ${summary.inputLength}B · 归一化偏移 ${summary.reportOffset} · ${eventCount} 个事件`, 'ok');
+        if (!summary.sdkEvent) {
+          setRawWarning('没有匹配到 N4 ACK/OK 输入事件；请确认粘贴的是完整 512/513 字节报告，而不是输出报告或截断片段。');
+        } else if (summary.inputLength === 513 && summary.reportOffset !== 1) {
+          setRawWarning('报告长度为 513B，但未在偏移 1 处发现 ACK/OK；页面不会擅自丢弃首字节。');
+        } else {
+          setRawWarning('');
+        }
+        return summary;
+      }
+      async function replayRawReport(forward = false) {
+        const decodeButton = $('raw-decode');
+        const forwardButton = $('raw-forward');
+        decodeButton.disabled = true;
+        forwardButton.disabled = true;
+        try {
+          const parsed = parseRawReport($('raw-report-input').value);
+          const reportId = Number($('raw-report-id').value);
+          if (!Number.isInteger(reportId) || reportId < 0 || reportId > 0xff) {
+            throw new Error('报告 ID 必须是 0-255 的整数');
+          }
+          setRawStatus(forward ? '正在调用 /api/raw，然后转发到 bridge…' : '正在调用 /api/raw 解码…');
+          setRawWarning('');
+          const raw = await jsonFetch('/api/raw', {
+            method: 'POST',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify({hex: parsed.hex}),
+          });
+          const result = {raw, reportId};
+          renderRawReplay(result, parsed, 'decode');
+          if (forward) {
+            const bridge = await jsonFetch('/api/bridge/report', {
+              method: 'POST',
+              headers: {'content-type': 'application/json'},
+              body: JSON.stringify({bytes: parsed.bytes, reportId}),
+            });
+            result.bridge = bridge;
+            renderRawReplay(result, parsed, 'forward');
+            renderSnapshot(bridge.bridge);
+          }
+          const summary = rawReplaySummary(result, parsed, forward ? 'forward' : 'decode');
+          print({rawReplay: summary});
+        } catch (error) {
+          setRawStatus(error.message, 'error');
+          print({error: forward ? '原始报告转发失败' : '原始报告解码失败', message: error.message});
+        } finally {
+          decodeButton.disabled = false;
+          forwardButton.disabled = false;
+        }
+      }
+      async function jsonFetch(url, options) {
+        const response = await fetch(url, options);
+        const body = await response.json();
+        // API failures use non-2xx status codes.  Successful diagnostic
+        // payloads may still contain an `error` detail (for example a
+        // read-only companion probe reporting that hidapi is unavailable),
+        // so do not turn those structured states into transport failures.
+        if (!response.ok) throw new Error(body.error || ('HTTP ' + response.status));
+        return body;
+      }
+      function decode(bytes) {
+        const offset = n4ReportOffset(bytes);
+        if (bytes.length < offset + 11) return null;
+        const code = bytes[offset + 9], state = bytes[offset + 10];
+        const rotate = activeKnobRotate[code];
+        if (rotate) return {
+          kind: 'encoder-rotate',
+          knob: rotate.knob, direction: rotate.direction, enabled: Boolean(rotate.enabled),
+          method: rotate.enabled ? 'v.oai.hid' : null,
+          params: rotate.enabled ? {k:rotate.key,act:rotate.act} : null,
+          hardwareCode:'0x'+byteHex(code), state:'0x'+byteHex(state), reportOffset: offset,
+        };
+        const press = activeKnobPress[code];
+        if (press) return {
+          kind: 'encoder-press',
+          knob: press.knob, enabled: Boolean(press.enabled),
+          method: press.enabled ? 'v.oai.hid' : null,
+          params: press.enabled ? {k:press.key,act:state===1?1:0} : null,
+          hardwareCode:'0x'+byteHex(code), state:'0x'+byteHex(state), reportOffset: offset,
+        };
+        if (CPP_SWIPE[code]) return {
+          kind: 'swipe', direction: CPP_SWIPE[code], microSupported: false,
+          hardwareCode:'0x'+byteHex(code), state:'0x'+byteHex(state), reportOffset: offset,
+        };
+        const button = activeButtonByCode.get(code);
+        if (button) {
+          const action = state === 1 ? 1 : 0;
+          return {
+            kind: 'button', index: button.index, targetKey: button.targetKey,
+            enabled: Boolean(button.enabled && button.targetKey),
+            method: button.enabled && button.targetKey ? 'v.oai.hid' : null,
+            params: button.enabled && button.targetKey ? {k: button.targetKey, act: action} : null,
+            hardwareCode:'0x'+byteHex(code), state:'0x'+byteHex(state), reportOffset: offset,
+          };
+        }
+        return null;
+      }
+      function subscribe() {
+        if (source) source.close();
+        source = new EventSource('/api/bridge/events');
+        for (const eventName of ['state','report','hardware','micro-event','config','rpc','compatibility','sideband','companion','native-status']) {
+          source.addEventListener(eventName, (event) => {
+            try {
+              const value = JSON.parse(event.data);
+              if (eventName === 'sideband') renderSideband(value);
+              if (eventName === 'companion') renderCompanion(value);
+               if (eventName === 'native-status') renderNativeBridge(value);
+               if (eventName === 'compatibility') renderCompat(value);
+               if (eventName === 'config') {
+                 applyDebugMappings(value.config || value);
+                 refresh();
+               }
+               if (eventName === 'state') {
+                 renderSnapshot(value.bridge || value);
+                 if (value.config) applyDebugMappings(value.config);
+                 if (value.sideband) renderSideband(value.sideband);
+                 if (value.companion) renderCompanion(value.companion);
+                 if (value.nativeBridge) renderNativeBridge({...value.nativeBridge, nativeControl: value.nativeControl});
+               }
+               if (eventName === 'report' || eventName === 'hardware') { renderSnapshot(value.bridge || value); guideInput(eventName, value); }
+               if (eventName === 'micro-event' && value.bridge) renderSnapshot(value.bridge);
+              if (eventName === 'micro-event') print({sse:eventName, ...value});
+              else if (eventName !== 'state') print({sse:eventName, ...value});
+            } catch (error) { print({sse:eventName,error:error.message,data:event.data}); }
+          });
+        }
+         setSseStatus('SSE 正在连接…');
+         source.onopen = () => setSseStatus('SSE 已连接', 'ok');
+         source.onerror = () => setSseStatus('SSE 重连中…', 'warn');
+      }
+      function setSseStatus(message, kind='') { $('sse-status').textContent = message; $('sse-status').className = 'status ' + kind;
+        if (kind === 'warn') $('guide-input-status').textContent = '实时反馈暂时中断，正在自动重连。此时页面没有变化，不代表设备没有响应。';
+        else if (kind === 'ok') $('guide-input-status').textContent = '实时反馈已就绪。请操作实体 N4，或展开下方的软件模拟。';
+      }
+      function renderSnapshot(value) { if (value) $('snapshot').textContent = JSON.stringify(value,null,2); }
+      async function refresh() {
+        try { const value = await jsonFetch('/api/bridge/state'); renderSnapshot(value); }
+        catch (error) { print({error:'读取 bridge 状态失败',message:error.message}); }
+      }
+      async function refreshBackendStatus() {
+        try { renderBackendStatus(await jsonFetch('/api/state')); }
+        catch (error) { guideBackendReady = false; $('guide-service').textContent = '无法连接本地服务。请确认设备助手后台仍在运行，再点击“重新检查”。'; $('guide-service').className = 'status error'; updateGuideConnection(); setBackendStatus(`无法读取当前实例 ${window.location.origin}：${error.message}`, 'error'); }
+      }
+      async function refreshDebugConfig() {
+        try { applyDebugMappings(await jsonFetch('/api/config')); }
+        catch (error) { print({error:'读取当前输入映射失败',message:error.message}); }
+      }
+      async function refreshSidebandState() {
+        try { renderSideband(await jsonFetch('/api/sideband/state')); }
+        catch (error) { renderSideband({status:'probe-error',message:error.message}); }
+      }
+      async function refreshCompanionState() {
+        try { renderCompanion(await jsonFetch('/api/companion/state')); }
+        catch (error) { renderCompanion({status:'enumeration-error',message:error.message}); }
+      }
+      async function refreshCompatState() {
+        try { renderCompat(await jsonFetch('/api/compat/state')); }
+        catch (error) { renderCompat({ok:false,message:error.message}); }
+      }
+      async function refreshNativeBridgeState() {
+        try { renderNativeBridge(await jsonFetch('/api/native/status')); }
+        catch (error) {
+          // Keep compatibility with an older backend while it is being
+          // restarted; /api/native/state remains the read-only heartbeat API.
+          try { renderNativeBridge(await jsonFetch('/api/native/state')); }
+          catch (_) { renderNativeBridge({status:'error',message:error.message,lastError:error.message,stale:true}); }
+        }
+      }
+      async function nativeLeaseRequest(action, token = webhidLeaseToken, extra = {}) {
+        const body = {action, ...extra};
+        if (token) body.token = token;
+        return jsonFetch('/api/native/lease', {
+          method: 'POST',
+          headers: {'content-type': 'application/json'},
+          body: JSON.stringify(body),
+        });
+      }
+      function stopWebhidLeaseHeartbeat() {
+        if (webhidLeaseTimer) { clearInterval(webhidLeaseTimer); webhidLeaseTimer = null; }
+      }
+      async function releaseWebhidLease({keepalive = false} = {}) {
+        stopWebhidLeaseHeartbeat();
+        const token = webhidLeaseToken;
+        webhidLeaseToken = null;
+        if (!token) return;
+        try {
+          const options = {
+            method: 'POST',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify({action: 'release', token}),
+          };
+          if (keepalive) options.keepalive = true;
+          await jsonFetch('/api/native/lease', options);
+        } catch (error) {
+          print({warning:'释放 WebHID lease 失败',message:error.message});
+        }
+      }
+      function startWebhidLeaseHeartbeat() {
+        stopWebhidLeaseHeartbeat();
+        if (!webhidLeaseToken) return;
+        webhidLeaseTimer = setInterval(async () => {
+          const token = webhidLeaseToken;
+          if (!token) return;
+          try {
+            await nativeLeaseRequest('heartbeat', token);
+          } catch (error) {
+            print({warning:'WebHID lease 心跳失败',message:error.message});
+            stopWebhidLeaseHeartbeat();
+            webhidLeaseToken = null;
+          }
+        }, 1000);
+      }
+      async function claimWebhidLease() {
+        const value = await nativeLeaseRequest('claim', null, {page: window.location.href});
+        webhidLeaseToken = value.token || null;
+        if (!webhidLeaseToken) throw new Error('服务端未返回 WebHID lease token');
+        startWebhidLeaseHeartbeat();
+        return value;
+      }
+      function nativeStartPayload() {
+        const transport = $('native-transport').value;
+        const visuals = $('native-visuals').checked;
+        const visualTarget = $('native-visual-target').value;
+        const inputProfile = $('native-input-profile').value;
+        if (transport === 'hidapi' && visuals) {
+          throw new Error('hidapi 是仅输入模式，请先取消“启用视觉输出”');
+        }
+        return {transport, visuals, visualTarget, inputProfile, webuiUrl: window.location.origin};
+      }
+      async function startNativeBridge() {
+        const button = $('start-native');
+        button.disabled = true;
+        try {
+          const payload = nativeStartPayload();
+          $('native-control-status').textContent = '正在检查 N4 占用并启动桥接…';
+          $('native-control-status').className = 'status';
+          const value = await jsonFetch('/api/native/start', {
+            method: 'POST',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify(payload),
+          });
+          renderNativeBridge(value);
+          print({nativeStart:value});
+          await refreshNativeBridgeState();
+        } catch (error) {
+          $('native-control-status').textContent = error.message;
+          $('native-control-status').className = 'status error';
+          print({error:'启动原生桥接失败',message:error.message});
+          guideFailure = '连接未成功。请确认 USB 已连接，并退出 StreamDock、断开其他 N4 页面，再重试。详细原因见高级调试。';
+          await refreshNativeBridgeState();
+        } finally { button.disabled = false; }
+      }
+      async function stopNativeBridge() {
+        const button = $('stop-native');
+        button.disabled = true;
+        try {
+          const value = await jsonFetch('/api/native/stop', {method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+          renderNativeBridge(value);
+          print({nativeStop:value});
+          await refreshNativeBridgeState();
+        } catch (error) {
+          $('native-control-status').textContent = error.message;
+          $('native-control-status').className = 'status error';
+          print({error:'停止原生桥接失败',message:error.message});
+          guideFailure = '断开未成功。请点击“重新检查”确认设备服务状态；详细原因见高级调试。';
+        } finally { button.disabled = false; }
+      }
+      function updateNativeTransportControls() {
+        const hidapi = $('native-transport').value === 'hidapi';
+        const visuals = $('native-visuals');
+        if (hidapi) {
+          visuals.checked = false;
+          visuals.disabled = true;
+          $('native-visual-target').disabled = true;
+        } else {
+          visuals.disabled = false;
+          $('native-visual-target').disabled = !visuals.checked;
+        }
+      }
+      async function probeSideband() {
+        const button = $('probe-sideband');
+        button.disabled = true;
+        renderSideband({status:'probing',message:'正在执行只读 GET_INFO 探测…'});
+        try {
+          const value = await jsonFetch('/api/sideband/probe', {method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+          renderSideband(value);
+          print({sidebandProbe:value});
+        } catch (error) {
+          renderSideband({status:'probe-error',message:error.message});
+          print({error:'sideband 探测失败',message:error.message});
+        } finally { button.disabled = false; }
+      }
+      async function probeCompanion() {
+        const button = $('probe-companion');
+        button.disabled = true;
+        renderCompanion({status:'probing',message:'正在只读枚举 Companion HID；不会打开设备…'});
+        try {
+          const value = await jsonFetch('/api/companion/probe', {method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+          renderCompanion(value);
+          print({companionProbe:value});
+        } catch (error) {
+          renderCompanion({status:'enumeration-error',message:error.message});
+          print({error:'Companion HID 探测失败',message:error.message});
+        } finally { button.disabled = false; }
+      }
+      async function connect() {
+        if (dev?.opened) return;
+        guideFailure = '';
+        if (!navigator.hid) { setStatus('当前浏览器不支持 WebHID', 'error'); print({error:'navigator.hid unavailable'}); return; }
+        try {
+          const devices = await navigator.hid.requestDevice({filters:[{vendorId:0x6602,productId:0x1001}]});
+          if (!devices.length) { setStatus('未选择设备'); return; }
+          dev = devices[0];
+          const info = {selected:true,product:dev.productName,manufacturer:dev.manufacturer,
+            vendorId:dev.vendorId,productId:dev.productId,collections:dev.collections.map((c) => ({
+              usagePage:'0x'+c.usagePage.toString(16),usage:c.usage,
+              inputReports:c.inputReports.map((r) => ({id:r.reportId,items:r.items.map((i) => ({usages:i.usages,reportSize:i.reportSize,reportCount:i.reportCount})),bits:r.items.reduce((n,i)=>n+i.reportSize*i.reportCount,0)})),
+              outputReports:c.outputReports.map((r) => ({id:r.reportId,items:r.items.map((i) => ({usages:i.usages,reportSize:i.reportSize,reportCount:i.reportCount}))}))
+            }))};
+          $('device').textContent = JSON.stringify(info,null,2); print(info);
+          dev.addEventListener('inputreport', onReport);
+          dev.addEventListener('disconnect', onDisconnect);
+          await claimWebhidLease();
+          await dev.open();
+          updateGuideConnection();
+          setStatus('已连接并监听：' + (dev.productName || 'N4'), 'ok');
+          print({connected:true,opened:dev.opened});
+        } catch (error) {
+          setStatus('连接失败：' + error.message, 'error');
+          print({error:error.message,stack:error.stack});
+          if (dev) { try { dev.removeEventListener('inputreport', onReport); dev.removeEventListener('disconnect', onDisconnect); } catch (_) {} }
+          await releaseWebhidLease();
+          dev = null;
+          updateGuideConnection();
+        }
+      }
+      async function onReport(event) {
+        const bytes = bytesFromDataView(event.data);
+        const copy = Array.from(bytes);
+        const seq = ++reportNo;
+        const decoded = decode(bytes);
+        print({report:seq,reportId:event.reportId,bytes:hex(bytes),decoded:decoded || '未匹配'});
+        if (!$('forward').checked) return;
+        // WebHID dispatches inputreport callbacks independently of the async
+        // handler.  Serialize HTTP forwarding so rapid rotary steps cannot be
+        // reordered by network scheduling before reaching the bridge.
+        forwardChain = forwardChain.then(async () => {
+          try {
+            const result = await jsonFetch('/api/bridge/report',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({bytes:copy,reportId:event.reportId})});
+            print({report:seq,bridge:result});
+            renderSnapshot(result.bridge);
+          } catch (error) { print({report:seq,error:'转发 bridge 失败',message:error.message}); }
+        }, async () => {
+          // Keep the chain usable even if a future handler introduces a
+          // rejection outside the guarded request above.
+        });
+        await forwardChain;
+      }
+      function onDisconnect() { setStatus('N4 已断开'); print({disconnected:true}); void releaseWebhidLease(); dev = null; updateGuideConnection(); }
+      async function disconnect() {
+        if (!dev) { await releaseWebhidLease(); return; }
+        try { dev.removeEventListener('inputreport',onReport); dev.removeEventListener('disconnect',onDisconnect); await dev.close(); } catch (error) { print({error:error.message}); }
+        await releaseWebhidLease();
+        dev = null; setStatus('已断开');
+        updateGuideConnection();
+      }
+      async function resetBridge() {
+        try { const value = await jsonFetch('/api/bridge/reset',{method:'POST'}); renderSnapshot(value.bridge); print({bridgeReset:value}); }
+        catch (error) { print({error:'重置失败',message:error.message}); }
+      }
+      function parseHex(value) { const text=String(value||'').replace(/^0x/i,'').trim(); if(!/^[0-9a-f]{1,2}$/i.test(text)) throw new Error('硬件码/状态请输入 00-FF'); return parseInt(text,16); }
+      async function inject(code, state) {
+        try {
+          const value = await jsonFetch('/api/bridge/hardware',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({hardwareCode:parseHex(code),state:parseHex(state)})});
+          print({manual:true,bridge:value}); renderSnapshot(value.bridge);
+        } catch (error) { $('guide-input-status').textContent = '模拟操作未送达。请点击“重新检查”确认本地服务状态。'; print({error:'注入失败',message:error.message}); }
+      }
+      $('connect').onclick=connect; $('disconnect').onclick=disconnect; $('reset').onclick=resetBridge;
+      $('start-native').onclick=startNativeBridge;
+      $('stop-native').onclick=stopNativeBridge;
+      $('refresh-native').onclick=refreshNativeBridgeState;
+      $('native-transport').onchange=updateNativeTransportControls;
+      $('native-visuals').onchange=updateNativeTransportControls;
+      $('probe-sideband').onclick=probeSideband;
+      $('probe-companion').onclick=probeCompanion;
+      $('run-compat-handshake').onclick=runCompatHandshake;
+      $('inject').onclick=()=>inject($('code').value,$('state').value);
+      $('raw-sample-512').onclick=()=>{
+        $('raw-report-input').value = buildRawSample(false);
+        setRawStatus('已填入 512B 顺时针样例；尚未发送。');
+        setRawWarning('');
+      };
+      $('raw-sample-513').onclick=()=>{
+        $('raw-report-input').value = buildRawSample(true);
+        setRawStatus('已填入 513B（前导 Report ID）样例；尚未发送。');
+        setRawWarning('');
+      };
+      $('raw-decode').onclick=()=>replayRawReport(false);
+      $('raw-forward').onclick=()=>replayRawReport(true);
+      $('raw-clear').onclick=()=>{
+        $('raw-report-input').value = '';
+        $('raw-report-result').textContent = '尚未执行。建议先点击“填入 513B（前导 ID）样例”，再点“仅解码”。';
+        setRawStatus('尚未回放原始报告');
+        setRawWarning('');
+      };
+       renderManualControls();
+       bindManualControls();
+      window.addEventListener('beforeunload',()=>{
+        if(source)source.close();
+        if(dev)dev.close().catch(()=>{});
+        void releaseWebhidLease({keepalive:true});
+      });
+      setupGuide();
+      setupNativeBridgeHelp();
+       updateNativeTransportControls();
+       subscribe(); refresh(); refreshBackendStatus(); refreshDebugConfig(); refreshSidebandState(); refreshCompanionState(); refreshCompatState(); refreshNativeBridgeState();
+      window.setInterval(refreshNativeBridgeState, 2000);
+    })();
+  </script>
+</body>
+</html>

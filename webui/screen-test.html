@@ -1,0 +1,17 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>N4 重影检查</title>
+<style>body{background:#111925;color:#edf2f9;font:17px/1.7 'Microsoft YaHei',sans-serif;max-width:850px;margin:40px auto;padding:20px}a{color:#7edbc2}button{font:inherit;border:1px solid #52657a;border-radius:14px;padding:22px;cursor:pointer}nav{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}#black{background:#000;color:white}#white{background:white;color:black}#box{background:#000;color:white}.panel{padding:20px;border:1px solid #52657a;border-radius:14px}#off{background:#275b50;color:white;width:100%;margin-top:22px}#preview{height:140px;display:grid;place-items:center;margin:15px 0;border:1px solid #596373}small{color:#aebdd0}button:disabled{opacity:.5}@media(max-width:550px){nav{grid-template-columns:1fr}}</style>
+<a href="/real-n4">← 返回设备页</a><h1>静态重影检查</h1>
+<p>先确认 N4 已连接，再依次点击黑色、白色、方框。每次等约3秒，观察实体屏幕，测试过程中不要按实体键。</p>
+<div class="panel">测试覆盖全部14个显示区域，暂停正常视觉更新；不会发送 Codex 按键。实体按键本身仍有效。退出测试后恢复最新状态，10分钟后也会自动恢复。白色较亮，不会闪烁或改变背光亮度。</div>
+<nav><button id="black">① 纯黑</button><button id="white">② 纯白</button><button id="box">③ 单一方框</button></nav>
+<div id="preview">图案示意（不是设备回读）</div><p id="status" role="status">读取测试状态…</p>
+<p>请记下：黑色时是否还能看到角色或字？白色时是否有固定暗线？方框外是否出现第二个框？保持静止后是否消失？</p>
+<button id="off">恢复正常显示</button><small>不要直接关闭页面来结束测试，请点恢复。当前软件缩略图可能仍显示正常主题，请以实体屏幕为准。</small>
+<script>
+const status=document.getElementById('status'),preview=document.getElementById('preview');let busy=false;
+function show(v){preview.replaceChildren();preview.style.background=v.mode==='white'?'white':'black';if(v.mode==='box'){const box=document.createElement('div');box.style='width:60px;height:60px;border:3px solid white';preview.append(box);}status.textContent=v.mode==='off'?'正常显示模式':'已请求'+({black:'纯黑',white:'纯白',box:'方框'}[v.mode])+'：等待设备上传，请观察实体画面（不是显示成功确认）。';}
+async function change(mode){busy=true;document.querySelectorAll('button').forEach(b=>b.disabled=true);try{const r=await fetch('/api/visual/screen-test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode})});if(!r.ok)throw Error('请求失败 '+r.status);show(await r.json());}catch(e){status.textContent=e.message+'，请检查启动器是否已重启更新。';}finally{busy=false;document.querySelectorAll('button').forEach(b=>b.disabled=false);}}
+for(const mode of ['black','white','box','off'])document.getElementById(mode).onclick=()=>change(mode);
+async function refresh(){if(busy)return;try{const r=await fetch('/api/visual/screen-test');if(!r.ok)throw Error();show(await r.json());}catch{status.textContent='测试服务不可用，请重启启动器后刷新页面。';}}
+refresh();setInterval(refresh,5000);
+</script></html>

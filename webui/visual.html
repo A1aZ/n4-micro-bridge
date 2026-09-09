@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mirabox N4 · Codex Micro 视觉监视器</title>
+  <style>
+    :root{color-scheme:dark;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#0e1219;color:#e8edf5}
+    *{box-sizing:border-box}body{max-width:1320px;margin:0 auto;padding:22px}
+    h1{font-size:25px;line-height:1.2;margin:0 0 6px}h2{font-size:17px;margin:0 0 10px}h3{font-size:14px;margin:16px 0 8px}
+    p{margin:7px 0}.muted{color:#9ba7ba;font-size:13px}.nav{display:flex;gap:13px;flex-wrap:wrap;margin:8px 0 18px}.nav a{color:#85b9ff;text-decoration:none}.nav a:hover{text-decoration:underline}
+    .grid{display:grid;grid-template-columns:minmax(500px,1.35fr) minmax(360px,1fr);gap:16px}.wide{grid-column:1/-1}
+    .card{background:#191e27;border:1px solid #303847;border-radius:12px;padding:16px}.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:8px 0}
+    button,.button{background:#263244;color:#fff;border:1px solid #46536a;border-radius:8px;padding:9px 12px;cursor:pointer;text-decoration:none;font:inherit;font-size:13px}
+    button:hover,.button:hover{background:#354967}button.primary{background:#2563a8;border-color:#438fd5}button.danger{background:#5d2930;border-color:#a94b58}
+    button:disabled{opacity:.5;cursor:not-allowed}.status{padding:9px 11px;background:#101821;border:1px solid #314257;border-radius:7px;color:#b7c8df;min-height:38px}.status.ok{border-color:#2e805c;color:#a8edc9}.status.error{border-color:#a94b58;color:#ffb8c0}
+    .screen-shell{width:min(800px,100%);aspect-ratio:5/3;margin:0 auto;background:#090d14;border:1px solid #314157;border-radius:12px;overflow:hidden;box-shadow:0 10px 28px #0005}.screen-shell svg{display:block;width:100%;height:100%}
+    .screen-meta{display:flex;justify-content:space-between;gap:10px;color:#9ba7ba;font-size:12px;margin-top:8px}.pill{display:inline-block;padding:2px 8px;border-radius:20px;background:#28364a;color:#bcd5f5;font-size:11px}
+    .key-grid{display:grid;grid-template-columns:repeat(7,minmax(100px,1fr));gap:8px}.key{min-width:0;padding:9px;background:#111822;border:1px solid #303d50;border-radius:9px}.key.disabled{opacity:.62}.key-head{display:flex;justify-content:space-between;gap:5px;font-size:12px;color:#dce6f5}.key-target{font:600 13px ui-monospace,monospace;color:#8ed6b2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.key-label{font-size:11px;color:#9ba7ba;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}.swatch{height:16px;border-radius:5px;margin:7px 0;border:1px solid #ffffff2e;background:#000}.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 7px;font:11px ui-monospace,monospace;color:#aebbd0}.kv b{font-weight:400;color:#7f91aa}.kv span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;border-bottom:1px solid #303847;padding:7px 5px;vertical-align:top}th{font-weight:600;color:#aebbd0}td code{color:#8ed6b2;font:11px ui-monospace,monospace}.light-chip{display:inline-flex;align-items:center;gap:5px}.light-dot{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid #fff4}
+    .transport{display:grid;grid-template-columns:repeat(4,minmax(100px,1fr));gap:8px}.metric{background:#111822;border:1px solid #303d50;border-radius:8px;padding:9px}.metric b{display:block;font-size:19px;color:#e8edf5}.metric span{font-size:11px;color:#9ba7ba}
+    pre,.log{white-space:pre-wrap;word-break:break-word;background:#080b10;border-radius:8px;padding:11px;font:11px ui-monospace,monospace}.log{height:245px;overflow:auto;margin:0}.json{max-height:260px;overflow:auto;margin:0}.hint{color:#b8c4d8;font-size:12px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.toolbar h2{margin:0}
+    .error{color:#ffb8c0}.oktext{color:#a8edc9}.nowrap{white-space:nowrap}
+    .bridge-card{border-color:#6a512b;background:#1d1b18}.bridge-card h2{color:#ffd58a}.bridge-card pre{margin:9px 0;max-height:180px;color:#dce6f5}.bridge-card .warning{color:#ffd58a;font-size:12px}
+    @media(max-width:1040px){.grid{grid-template-columns:1fr}.key-grid{grid-template-columns:repeat(7,minmax(90px,1fr))}}
+    @media(max-width:720px){body{padding:13px}.key-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.transport{grid-template-columns:repeat(2,1fr)}.screen-meta{display:block}.screen-meta span{display:block;margin-top:3px}}
+  </style>
+</head>
+<body>
+  <h1>Mirabox N4 · Codex Micro 视觉监视器</h1>
+  <p class="muted">实时查看 Codex Micro 发回的任务灯/按键状态，以及送往虚拟 Micro 的 HID 输入队列。页面只调用本机 WebUI API，不安装驱动。</p>
+  <nav class="nav"><a href="/">首页 / 协议测试台</a><a href="/real-n4">真实 N4</a><a href="/config">配置映射</a><a href="/api/visual/preview" target="_blank" rel="noreferrer">独立 SVG 预览</a></nav>
+
+  <div id="status" class="status">正在连接视觉状态 API…</div>
+  <div id="backend-status" class="status" style="margin-top:8px">正在检查当前 WebUI 实例…</div>
+
+  <div class="grid">
+    <section class="card wide bridge-card">
+      <div class="toolbar"><h2>物理 N4 原生桥接（可选）</h2><span class="pill">手动启动 · 不自动运行</span></div>
+      <p class="warning">本页只监视 WebUI。要让 Python SDK 读写实体 N4，请先关闭本页或 <a href="/real-n4">真实 N4</a> 中的 WebHID 连接；浏览器 WebHID 与 Python/hidapi 不能同时独占同一个 N4 接口。</p>
+      <p class="hint">下面的命令会随当前页面地址生成（例如页面在 <code>http://127.0.0.1:8791</code>，就会使用 8791）。请在项目根目录的 PowerShell 中手动执行；页面不会启动进程、安装驱动或接管 USB。</p>
+      <pre id="bridge-command">正在生成当前页面对应的命令…</pre>
+      <div class="row"><button id="copy-bridge-command">复制 live 命令</button><a class="button" href="/real-n4">打开 WebHID 测试页</a><a class="button" href="/config">检查映射</a></div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar"><h2>N4 800 × 480 屏幕预览</h2><span id="phase" class="pill">phase —</span></div>
+      <div id="screen" class="screen-shell" aria-label="N4 800 x 480 SVG 预览"><div class="muted" style="padding:30px;text-align:center">等待 /api/visual/state…</div></div>
+      <div class="screen-meta"><span id="screen-info">尺寸 — · 旋转 —</span><span id="model-info">模型 —</span></div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar"><h2>Micro → N4 灯光字段</h2><button id="refresh" class="primary">刷新状态</button></div>
+      <p class="hint">字段遵循 Micro wire：<code>c</code> 颜色、<code>b</code> 亮度、<code>e</code> 效果、<code>s</code> 速度、<code>sk/sa/m</code> 扩展标志。</p>
+      <div id="lighting" class="json">等待状态…</div>
+    </section>
+
+    <section class="card wide">
+      <div class="toolbar"><h2>14 个 N4 按键</h2><span id="key-count" class="pill">—</span></div>
+      <div id="keys" class="key-grid"></div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar"><h2>发送 Micro 视觉 RPC</h2><span class="pill">POST /api/rpc</span></div>
+      <p class="hint">这些按钮会模拟 Codex Desktop 发出的 <code>v.oai.thstatus</code> / <code>v.oai.rgbcfg</code> 通知，并立即更新预览。</p>
+      <div class="row"><button id="th-demo" class="primary">预览 Micro 六种状态</button><button id="th-off">发送 thstatus：全部关闭</button></div>
+      <p class="hint">模拟预览顺序：01白色空闲、02蓝色工作中（模拟选中脉动）、03绿色完成且未读、04琥珀色等待输入、05红色错误、06熄灭未分配。不是实际任务状态；真实主机更新会覆盖预览。脉动表示选中，不是运行判据。</p>
+      <div class="row"><button id="rgb-demo" class="primary">发送 rgbcfg：键/环境示例</button><button id="rgb-off">发送 rgbcfg：全部关闭</button></div>
+      <div class="row"><button id="rpc-version">查询 sys.version</button><button id="rpc-status">查询 device.status</button></div>
+      <pre id="rpc-result" class="json">尚未发送 RPC</pre>
+    </section>
+
+    <section class="card">
+      <div class="toolbar"><h2>Transport queue</h2><div class="row" style="margin:0"><button id="queue-refresh">刷新</button><button id="queue-drain">读取并清空输入队列</button></div></div>
+      <p class="hint">输入队列是待交给 Codex 的 64 字节 Micro HID reports；输出计数来自 Codex → bridge 的方向。</p>
+      <div id="transport" class="transport"></div>
+      <pre id="queue-result" class="json" style="margin-top:9px">等待 transport 状态…</pre>
+    </section>
+
+    <section class="card wide">
+      <div class="toolbar"><h2>实时事件</h2><div class="row" style="margin:0"><span id="sse-state" class="pill">SSE 未连接</span><button id="clear-log">清空</button></div></div>
+      <p class="hint">监听 <code>visual</code>、<code>transport-input</code>、<code>transport-output</code>；初始快照来自 <code>/api/bridge/events</code>。</p>
+      <div id="events" class="log" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = (id) => document.getElementById(id);
+      const MAX_LOG = 120;
+      let source = null;
+      let pollTimer = null;
+      let model = null;
+      let lighting = null;
+      let transport = null;
+      let lastState = null;
+
+      function setStatus(message, kind = '') { $('status').textContent = message; $('status').className = 'status ' + kind; }
+      function setBackendStatus(message, kind = '') { $('backend-status').textContent = message; $('backend-status').className = 'status ' + kind; }
+      function formatHex(value, width = 4) {
+        const number = Number(value);
+        return Number.isFinite(number) ? '0x' + number.toString(16).padStart(width, '0').toUpperCase() : '—';
+      }
+      function renderBackendStatus(value) {
+        const missing = [];
+        const server = value && value.server;
+        const features = value && value.features;
+        if (!server || server.schema !== 'mirabox.codex.micro.webui' || Number(server.apiVersion) < 2) missing.push('server API v2');
+        if (!value || !value.bridge) missing.push('bridge');
+        if (!value || !value.transport) missing.push('transport');
+        if (!value || !value.visual) missing.push('visual');
+        const featureLevel = (name) => {
+          const advertised = features?.[name];
+          if (advertised === true) return 1;
+          const level = Number(advertised);
+          return Number.isFinite(level) ? level : 0;
+        };
+        for (const feature of ['bridgeApi','transportApi','visualApi','eventStream']) {
+          if (featureLevel(feature) < 1) missing.push(`feature:${feature}`);
+        }
+        if (missing.length) {
+          setBackendStatus(`当前实例 ${window.location.origin} 是旧进程或能力不完整：缺少 ${missing.join('、')}。页面文件可能已更新，但 Node 后端仍需重启；本页不会自动切换端口。`, 'error');
+          return;
+        }
+        const identity = value.identity || {};
+        const bridge = value.bridge || {};
+        const stats = bridge.stats || {};
+        const cfg = bridge.config || value.config || {};
+        const transport = value.transport || {};
+        setBackendStatus(`后端 ${window.location.origin} · build ${server.buildId || 'unknown'} · PID ${server.pid ?? '—'} · Micro ${formatHex(identity.vendorId)}:${formatHex(identity.productId)} · profile ${cfg.inputProfile || 'default'} · 队列 ${transport.queuedInputReports ?? 0} · 已解码 ${stats.reports ?? 0} 条`, 'ok');
+      }
+      function fmt(value) { return JSON.stringify(value, null, 2); }
+      function time() { return new Date().toLocaleTimeString(); }
+      function esc(value) {
+        return String(value ?? '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+      }
+      function safeColor(value) {
+        const text = String(value || '');
+        return /^#[0-9a-f]{6}$/i.test(text) ? text : '#000000';
+      }
+      function bridgeBaseUrl() {
+        return /^https?:$/.test(window.location.protocol) ? window.location.origin : 'http://127.0.0.1:8787';
+      }
+      function setupBridgeHelp() {
+        const base = bridgeBaseUrl();
+        const projectPython = `.\\.hidapi-venv\\Scripts\\python.exe`;
+        const fallbackPython = 'python';
+        const liveArgs = `scripts\\n4-webui-bridge.py --live --webui-url ${base} --sdk-path upstream\\StreamDock-Device-SDK\\Python-SDK\\src --poll-ms 500 --visual-refresh-ms 250`;
+        const checkArgs = `scripts\\n4-webui-bridge.py --check-only --webui-url ${base}`;
+        const live = `${projectPython} ${liveArgs}`;
+        const check = `${projectPython} ${checkArgs}`;
+        const fallbackLive = `${fallbackPython} ${liveArgs}`;
+        const fallbackCheck = `${fallbackPython} ${checkArgs}`;
+        $('bridge-command').textContent = `推荐（项目环境，含 hidapi/Pillow）：\n安全检查（不打开 N4）：\n${check}\n\n实体 N4 实时桥接（关闭 WebHID 后手动执行）：\n${live}\n\n如果项目环境不存在，可退回 PATH Python：\n${fallbackCheck}\n${fallbackLive}`;
+        $('copy-bridge-command').onclick = async () => {
+          try { await navigator.clipboard.writeText(live); setStatus('live 命令已复制；请确认已关闭 WebHID 后再在项目根目录执行。', 'ok'); }
+          catch (error) { log('bridge-command-copy-error', {error:error.message}); setStatus('复制失败：' + error.message, 'error'); }
+        };
+      }
+      function compact(value) {
+        if (!value || typeof value !== 'object') return value;
+        const out = Array.isArray(value) ? value.slice() : {...value};
+        // SVG strings make the event log unreadable; retain useful metadata.
+        if (out.model && typeof out.model === 'object') {
+          out.model = {...out.model};
+          if (out.model.screen) out.model.screen = {...out.model.screen, svg: out.model.screen.svg ? `[SVG ${out.model.screen.width || 800}x${out.model.screen.height || 480}]` : undefined};
+          if (Array.isArray(out.model.buttons)) out.model.buttons = out.model.buttons.map((button) => ({...button, svg: button.svg ? '[key SVG]' : undefined}));
+        }
+        if (out.visual && typeof out.visual === 'object') {
+          out.visual = {...out.visual};
+          if (out.visual.screen) out.visual.screen = {...out.visual.screen, svg: out.visual.screen.svg ? `[SVG ${out.visual.screen.width || 800}x${out.visual.screen.height || 480}]` : undefined};
+          if (Array.isArray(out.visual.buttons)) out.visual.buttons = out.visual.buttons.map((button) => ({...button, svg: button.svg ? '[key SVG]' : undefined}));
+        }
+        return out;
+      }
+      function log(event, value) {
+        const line = `${time()}  ${event}  ${typeof value === 'string' ? value : fmt(compact(value))}`;
+        const node = $('events');
+        node.textContent += (node.textContent ? '\n' : '') + line;
+        const lines = node.textContent.split('\n');
+        if (lines.length > MAX_LOG) node.textContent = lines.slice(-MAX_LOG).join('\n');
+        node.scrollTop = node.scrollHeight;
+      }
+      function colorHex(value) {
+        if (typeof value === 'string') return value.startsWith('#') ? value : '#' + value.replace(/^0x/i, '').padStart(6, '0');
+        return '#' + (Number(value || 0) & 0xffffff).toString(16).padStart(6, '0');
+      }
+      function lightRows(state) {
+        if (!state) return '<span class="muted">暂无灯光状态</span>';
+        const rows = [];
+        (state.agents || []).forEach((light, id) => rows.push({name:`Agent ${id}`, light, source:'thstatus'}));
+        rows.push({name:'命令键', light:state.keys || {}, source:'rgbcfg.keys'});
+        rows.push({name:'环境光', light:state.ambient || {}, source:'rgbcfg.ambient'});
+        return '<table><thead><tr><th>区域</th><th>颜色</th><th>b</th><th>e</th><th>s</th><th>sk/sa/m</th><th>来源</th></tr></thead><tbody>' + rows.map(({name,light,source}) => {
+          const c = safeColor(colorHex(light.c)); const b = Number(light.b || 0); const e = light.effectName ?? light.e ?? 0;
+          return `<tr><td>${esc(name)}</td><td><span class="light-chip"><i class="light-dot" style="background:${c}"></i><code>${esc(c)}</code></span></td><td>${Math.round(b * 100)}%</td><td>${esc(e)}</td><td>${esc(light.s ?? 0)}</td><td>${esc(light.sk ?? 0)}/${esc(light.sa ?? 0)}/${esc(light.m ?? 0)}</td><td class="muted">${esc(source)}</td></tr>`;
+        }).join('') + '</tbody></table>';
+      }
+      function renderScreen(nextModel) {
+        if (!nextModel) return;
+        model = nextModel;
+        const svg = model.screen?.svg;
+        $('screen').innerHTML = svg || '<div class="muted" style="padding:30px;text-align:center">状态中没有 screen.svg</div>';
+        $('phase').textContent = `phase ${Number(model.phase ?? 0.5).toFixed(2)}`;
+        $('screen-info').textContent = `尺寸 ${model.screen?.width || 800} × ${model.screen?.height || 480} · 旋转 ${model.screen?.rotation ?? '—'}° · ${model.screen?.format || 'SVG'}`;
+        $('model-info').textContent = `${model.schema || 'mirabox.n4.render'} v${model.version ?? '—'}`;
+        $('key-count').textContent = `${(model.buttons || []).filter((button) => button.enabled).length}/${(model.buttons || []).length || 14} 已启用`;
+        renderKeys(model.buttons || []);
+      }
+      function renderKeys(buttons) {
+        $('keys').innerHTML = buttons.map((button) => {
+          const light = button.light || {}; const c = safeColor(light.colorHex || colorHex(light.c)); const intensity = Number(light.intensity ?? light.b ?? 0);
+          const style = `background:${c};opacity:${Math.max(0.08, Math.min(1, intensity || 0.08))}`;
+          return `<article class="key${button.enabled ? '' : ' disabled'}"><div class="key-head"><span>#${esc(button.index)}</span><span>${esc(button.kind || '')}</span></div><div class="key-target">${esc(button.targetKey || '未映射')}</div><div class="key-label">${esc(button.label || '')}</div><div class="swatch" style="${style}" title="${esc(c)}"></div><div class="kv"><b>输入</b><span>0x${Number(button.hardwareCode || 0).toString(16).padStart(2,'0').toUpperCase()}</span><b>图像码</b><span>0x${Number(button.imageHardwareCode || 0).toString(16).padStart(2,'0').toUpperCase()}</span><b>光源</b><span>${esc(button.source || 'none')}</span><b>颜色</b><span>${esc(c)}</span><b>b/e/s</b><span>${Math.round(Number(light.b || 0) * 100)}% / ${esc(light.effectName ?? light.e ?? 0)} / ${esc(light.s ?? 0)}</span><b>标志</b><span>${esc(light.sk ?? 0)}/${esc(light.sa ?? 0)}/${esc(light.m ?? 0)}</span></div></article>`;
+        }).join('');
+      }
+      function renderTransport(nextTransport) {
+        if (!nextTransport) return;
+        transport = nextTransport;
+        const stats = transport.stats || {};
+        const values = [
+          ['待发送 reports', transport.queuedInputReports ?? 0],
+          ['队列上限', transport.maxQueuedReports ?? 0],
+          ['设备消息', stats.deviceMessages ?? 0],
+          ['Codex reports', stats.hostReports ?? 0],
+          ['Codex 消息', stats.hostMessages ?? 0],
+          ['已取出 reports', stats.drainedReports ?? 0],
+          ['丢弃 reports', stats.droppedReports ?? 0],
+          ['RPC replies', stats.replies ?? 0],
+        ];
+        $('transport').innerHTML = values.map(([label,value]) => `<div class="metric"><b>${value}</b><span>${label}</span></div>`).join('');
+      }
+      function applyState(payload, sourceName = 'state') {
+        if (!payload || typeof payload !== 'object') return;
+        const visual = payload.visual && typeof payload.visual === 'object' ? payload.visual : null;
+        const visualModel = visual?.model || (visual?.screen ? visual : null);
+        const nextModel = payload.model || visualModel;
+        const nextLighting = payload.lighting || visual?.lighting || visualModel?.lighting || null;
+        const nextTransport = payload.transport || null;
+        if (nextModel) renderScreen(nextModel);
+        if (nextLighting) { lighting = nextLighting; $('lighting').innerHTML = lightRows(lighting); }
+        if (nextTransport) renderTransport(nextTransport);
+        lastState = payload;
+        if (sourceName === 'poll') setStatus(source ? '已连接 SSE（轮询作为兜底）' : '已通过轮询更新', source ? 'ok' : '');
+      }
+      async function jsonFetch(url, options) {
+        const response = await fetch(url, options);
+        const text = await response.text(); let value;
+        try { value = text ? JSON.parse(text) : {}; } catch (_) { value = {error:text}; }
+        if (!response.ok || value.error) throw new Error(value.error || `HTTP ${response.status}`);
+        return value;
+      }
+      async function refresh() {
+        try { const value = await jsonFetch('/api/visual/state?phase=' + ((Date.now() % 6000) / 6000).toFixed(3)); applyState(value, 'poll'); }
+        catch (error) { setStatus('读取视觉状态失败：' + error.message, 'error'); log('poll-error', {error:error.message}); }
+      }
+      async function refreshBackendStatus() {
+        try { renderBackendStatus(await jsonFetch('/api/state')); }
+        catch (error) { setBackendStatus(`无法读取当前实例 ${window.location.origin}：${error.message}`, 'error'); }
+      }
+      async function queueRefresh(drain = false) {
+        try {
+          const value = await jsonFetch('/api/transport/input?limit=64&drain=' + (drain ? '1' : '0'));
+          renderTransport(value.transport); $('queue-result').textContent = fmt({drained:value.drained,reports:(value.reports || []).map((report) => report.hex)}); log('transport-queue', {drained:value.drained,count:value.reports?.length || 0});
+        } catch (error) { $('queue-result').textContent = fmt({error:error.message}); log('transport-queue-error', {error:error.message}); }
+      }
+      async function rpc(request) {
+        try {
+          const value = await jsonFetch('/api/rpc', {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(request)});
+          $('rpc-result').textContent = fmt(value); applyState({visual:value.visual,transport:value.transport}, 'rpc'); log('rpc', {request,parsed:value.parsed,replies:value.replies,transport:value.transport});
+        } catch (error) { $('rpc-result').textContent = fmt({error:error.message,request}); setStatus('RPC 失败：' + error.message, 'error'); log('rpc-error', {error:error.message,request}); }
+      }
+      const colors = [0xffffff,0x309fff,0x32d074,0xffb340,0xf34f5f,0];
+      function thDemo() { return rpc({method:'v.oai.thstatus',params:colors.map((c,id)=>({id,c,b:id===5?0:1,e:id===5?'off':id===1?'breath':'solid',s:id===1?.35:0})),id:Date.now() & 0xffff}); }
+      function thOff() { return rpc({method:'v.oai.thstatus',params:colors.map((_,id)=>({id,c:0,b:0,e:'off',s:0})),id:Date.now() & 0xffff}); }
+      function rgbDemo() { return rpc({method:'v.oai.rgbcfg',params:{keys:{c:0x28d7a5,b:.45,e:'breath',s:.5},ambient:{c:0x182d52,b:.32,e:'gradient',s:.25}},id:Date.now() & 0xffff}); }
+      function rgbOff() { return rpc({method:'v.oai.rgbcfg',params:{keys:{c:0,b:0,e:'off',s:0},ambient:{c:0,b:0,e:'off',s:0}},id:Date.now() & 0xffff}); }
+      function subscribe() {
+        if (source) source.close();
+        try { source = new EventSource('/api/bridge/events'); }
+        catch (error) { $('sse-state').textContent = 'SSE 不可用'; log('sse-error', {error:error.message}); return; }
+        const wanted = ['state','visual','transport-input','transport-output','transport-state','rpc','config','visual-error'];
+        wanted.forEach((eventName) => source.addEventListener(eventName, (event) => {
+          let value; try { value = event.data ? JSON.parse(event.data) : {}; } catch (_) { value = {raw:event.data}; }
+          $('sse-state').textContent = 'SSE 已连接';
+          if (eventName === 'visual') applyState(value, 'visual');
+          else if (eventName === 'state') applyState(value, 'sse-state');
+          else if (eventName === 'transport-input' || eventName === 'transport-output' || eventName === 'transport-state') { if (value.transport) renderTransport(value.transport); if (value.visual) applyState({visual:value.visual,lighting:value.lighting,transport:value.transport}, eventName); }
+          else if (eventName === 'rpc' && value.transport) renderTransport(value.transport);
+          log(eventName, value);
+          if (eventName === 'visual') setStatus('已收到 Codex 视觉状态更新', 'ok');
+        }));
+        source.onopen = () => { $('sse-state').textContent = 'SSE 已连接'; setStatus('已连接视觉状态 SSE', 'ok'); };
+        source.onerror = () => { $('sse-state').textContent = 'SSE 重连中…'; setStatus('SSE 暂时断开，正在重连；轮询仍会继续', ''); };
+      }
+      $('refresh').onclick = refresh;
+      $('queue-refresh').onclick = () => queueRefresh(false);
+      $('queue-drain').onclick = () => queueRefresh(true);
+      $('clear-log').onclick = () => { $('events').textContent = ''; };
+      $('th-demo').onclick = thDemo; $('th-off').onclick = thOff; $('rgb-demo').onclick = rgbDemo; $('rgb-off').onclick = rgbOff;
+      $('rpc-version').onclick = () => rpc({method:'sys.version',params:{},id:Date.now() & 0xffff});
+      $('rpc-status').onclick = () => rpc({method:'device.status',params:{},id:Date.now() & 0xffff});
+      window.addEventListener('beforeunload', () => { if (source) source.close(); if (pollTimer) clearInterval(pollTimer); });
+      setupBridgeHelp();
+      (async () => { await refresh(); await queueRefresh(false); await refreshBackendStatus(); subscribe(); pollTimer = setInterval(refresh, 2500); })();
+    })();
+  </script>
+</body>
+</html>

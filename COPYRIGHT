@@ -1,0 +1,7 @@
+Copyright (C) 2026 A1aZ
+
+Original application, bridge and launcher code: AGPL-3.0-only.
+Original application icon and code-native robot artwork: AGPL-3.0-only.
+Third-party code and artwork retain their original notices and licenses.
+The separately built Microsoft-derived virtual HID driver remains MS-PL.
+See THIRD_PARTY_NOTICES.md and the relevant component license files.

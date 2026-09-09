@@ -1,0 +1,186 @@
+{
+  "schema": "mirabox.codex.micro",
+  "version": 1,
+  "inputProfile": "custom",
+  "device": {
+    "vendorId": 26114,
+    "productId": 4097,
+    "usagePage": 65440,
+    "usage": 1,
+    "reportId": 0
+  },
+  "release": {
+    "synthesize": true,
+    "delayMs": 100
+  },
+  "visual": {
+    "theme": "pixel",
+    "stripMode": "knobs"
+  },
+  "buttons": [
+    {
+      "id": "button-1",
+      "label": "N4 按键 1",
+      "hardwareCode": 1,
+      "targetKey": "AG00",
+      "enabled": true
+    },
+    {
+      "id": "button-2",
+      "label": "N4 按键 2",
+      "hardwareCode": 2,
+      "targetKey": "AG01",
+      "enabled": true
+    },
+    {
+      "id": "button-3",
+      "label": "N4 按键 3",
+      "hardwareCode": 3,
+      "targetKey": "AG02",
+      "enabled": true
+    },
+    {
+      "id": "button-4",
+      "label": "N4 按键 4",
+      "hardwareCode": 4,
+      "targetKey": "AG03",
+      "enabled": true
+    },
+    {
+      "id": "button-5",
+      "label": "N4 按键 5",
+      "hardwareCode": 5,
+      "targetKey": "AG04",
+      "enabled": true
+    },
+    {
+      "id": "button-6",
+      "label": "N4 按键 6",
+      "hardwareCode": 6,
+      "targetKey": "AG05",
+      "enabled": true
+    },
+    {
+      "id": "button-7",
+      "label": "N4 按键 7",
+      "hardwareCode": 7,
+      "targetKey": "ACT06",
+      "enabled": true
+    },
+    {
+      "id": "button-8",
+      "label": "N4 按键 8",
+      "hardwareCode": 8,
+      "targetKey": "ACT07",
+      "enabled": true
+    },
+    {
+      "id": "button-9",
+      "label": "N4 按键 9",
+      "hardwareCode": 9,
+      "targetKey": "ACT08",
+      "enabled": true
+    },
+    {
+      "id": "button-10",
+      "label": "N4 按键 10",
+      "hardwareCode": 10,
+      "targetKey": "ACT09",
+      "enabled": true
+    },
+    {
+      "id": "button-11",
+      "label": "N4 按键 11",
+      "hardwareCode": 64,
+      "targetKey": "ACT10",
+      "enabled": true
+    },
+    {
+      "id": "button-12",
+      "label": "N4 按键 12",
+      "hardwareCode": 65,
+      "targetKey": "ACT11",
+      "enabled": true
+    },
+    {
+      "id": "button-13",
+      "label": "N4 按键 13",
+      "hardwareCode": 66,
+      "targetKey": "ACT12",
+      "enabled": true
+    },
+    {
+      "id": "button-14",
+      "label": "N4 按键 14",
+      "hardwareCode": 67,
+      "targetKey": null,
+      "enabled": false
+    }
+  ],
+  "knobs": [
+    {
+      "id": "knob-1",
+      "label": "旋钮 1",
+      "hardware": {
+        "ccw": 160,
+        "cw": 161,
+        "press": 55,
+        "label": "旋钮 1"
+      },
+      "rotateCcw": "ENC_CC",
+      "rotateCw": "ENC_CW",
+      "press": "ENC",
+      "enabled": true,
+      "mode": "micro",
+      "reasoningConfigured": false
+    },
+    {
+      "id": "knob-2",
+      "label": "旋钮 2",
+      "hardware": {
+        "ccw": 80,
+        "cw": 81,
+        "press": 53,
+        "label": "旋钮 2"
+      },
+      "rotateCcw": "ENC_CC",
+      "rotateCw": "ENC_CW",
+      "press": "ENC",
+      "enabled": true,
+      "mode": "scroll",
+      "reasoningConfigured": false
+    },
+    {
+      "id": "knob-3",
+      "label": "旋钮 3",
+      "hardware": {
+        "ccw": 144,
+        "cw": 145,
+        "press": 51,
+        "label": "旋钮 3"
+      },
+      "rotateCcw": "ENC_CC",
+      "rotateCw": "ENC_CW",
+      "press": "ENC",
+      "enabled": true,
+      "mode": "reasoning",
+      "reasoningConfigured": false
+    },
+    {
+      "id": "knob-4",
+      "label": "旋钮 4",
+      "hardware": {
+        "ccw": 112,
+        "cw": 113,
+        "press": 54,
+        "label": "旋钮 4"
+      },
+      "rotateCcw": "ENC_CC",
+      "rotateCw": "ENC_CW",
+      "press": "ENC",
+      "enabled": true,
+      "mode": "brightness",
+      "reasoningConfigured": false
+    }
+  ]
+}

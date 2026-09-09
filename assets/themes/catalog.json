@@ -1,0 +1,23 @@
+{
+  "default": "symbols",
+  "themes": [
+    {"id":"symbols","name":"极简图标","description":"图标与状态环，安静、清晰"},
+    {"id":"atlas","name":"大数字任务","description":"醒目的任务编号，一眼找到位置"},
+    {"id":"pixel","name":"像素伙伴","description":"六个像素角色，保留清晰的状态标记"},
+    {"id":"debug","name":"调试文字","description":"保留原有硬件标签，便于排查"}
+  ],
+  "taskIcons": ["play-fill","stack-fill","squares-four-fill","sun-fill","user-fill","folder-fill"],
+  "commands": {
+    "ACT06":{"icon":"lightning-fill","label":"快速"},
+    "ACT07":{"icon":"check-circle-bold","label":"确认"},
+    "ACT08":{"icon":"x-circle-bold","label":"拒绝"},
+    "ACT09":{"icon":"arrow-bend-up-right-fill","label":"新建"},
+    "ACT10":{"icon":"microphone-fill","label":"语音"},
+    "ACT11":{"icon":"microphone-slash-fill","label":"静音"},
+    "ACT12":{"icon":"gear-six-fill","label":"设置"}
+  },
+  "unassigned":{"icon":"dots-three-bold","label":"未分配"},
+  "variants":{"atlas":{"ACT07":"check-bold","ACT08":"x-bold"},"pixel":{"ACT07":"check-bold","ACT08":"x-bold"}},
+  "knobIcons":{"micro":"squares-four-fill","scroll":"arrows-down-up-bold","reasoning":"brain-fill","brightness":"sun-fill"},
+  "notice":"图标对应默认 Micro 键位；若在 Codex 内自定义了动作，实际功能以 Codex 的绑定为准。角色用于区分任务槽，不代表自动获取了任务名称或进度。"
+}

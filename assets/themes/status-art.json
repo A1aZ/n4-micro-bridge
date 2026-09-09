@@ -1,0 +1,9 @@
+{
+  "idle": "pixel-04",
+  "working": "pixel-01",
+  "complete": "pixel-03",
+  "attention": "pixel-02",
+  "error": "pixel-05",
+  "off": "pixel-06",
+  "unknown": "pixel-06"
+}
