@@ -35,8 +35,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 3177,
-      "sha256": "4fe050c189b40600bbbfb98f228d27d0782520cdcfa510efdfd99e80a88b0b86"
+      "bytes": 3184,
+      "sha256": "2621a6d46061a46d05a6c4f9de3b1c3694138ba238187d0da65b9275dee94821"
     },
     {
       "path": "SECURITY.md",
@@ -575,13 +575,13 @@
     },
     {
       "path": "docs/portable-app.md",
-      "bytes": 1933,
-      "sha256": "3e57b00f71d96de5c5af10d6e10e38c03cabc67da8cc1d342a13e0d9a755e8f4"
+      "bytes": 1961,
+      "sha256": "cb47a0136496419f74ba7d8e965ebb51c78199c8047df5b837417681bf969e07"
     },
     {
       "path": "docs/release.md",
-      "bytes": 2319,
-      "sha256": "712f22c5d7d384d4015e6f72c8fb4b8f57eea3da07ee30c0f51f246c1d8cc31e"
+      "bytes": 2320,
+      "sha256": "98b049659c48ee26c56ee466ea6d6366a9eaf07712dfc131c0160b323c7ce193"
     },
     {
       "path": "docs/status-robot.md",
@@ -715,8 +715,8 @@
     },
     {
       "path": "scripts/build-portable.ps1",
-      "bytes": 3545,
-      "sha256": "e5a6cab65cb38cc573c297aaa38df5e293d649afcfb653d2ae8d17d2a6448e61"
+      "bytes": 3546,
+      "sha256": "bab4a9ff0f0e3eacce3415dcc6c65c8f44bf851aa9f4328049dee38fb247625f"
     },
     {
       "path": "scripts/build-status-robots.cjs",
@@ -1065,8 +1065,8 @@
     },
     {
       "path": "tests/release-hygiene.test.cjs",
-      "bytes": 940,
-      "sha256": "4990531bd295cb3313f3a2906cfb54c6768947431398bff9010c64dfbd045383"
+      "bytes": 1040,
+      "sha256": "690114ac708f99f5021bb8d0fae32523d14adc0652a48cf15afedc9bd2a96fdc"
     },
     {
       "path": "tests/status-robot.test.cjs",

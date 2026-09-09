@@ -34,7 +34,7 @@ $site=& $python -c 'import sysconfig; print(sysconfig.get_path("purelib"))'
 Copy-Item -LiteralPath $base -Destination "$output\runtime\python" -Recurse
 Get-ChildItem -LiteralPath $site | Copy-Item -Destination "$output\runtime\python\Lib\site-packages" -Recurse -Force
 Copy-Item -LiteralPath $node -Destination "$output\runtime\node.exe"
-& $CscPath /nologo /target:winexe /platform:x64 /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll /win32icon:"$project\assets\app\app.ico" /out:"$output\Mirabox.exe" "$project\scripts\MiraboxLauncher.cs"
+& $CscPath /nologo /target:winexe /platform:x64 /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll /win32icon:"$project\assets\app\app.ico" /out:"$output\N4Bridge.exe" "$project\scripts\MiraboxLauncher.cs"
 if ($LASTEXITCODE -ne 0) { throw 'Launcher compilation failed' }
 foreach ($name in @('README.md','LICENSE','COPYRIGHT','THIRD_PARTY_NOTICES.md','SECURITY.md','CHANGELOG.md','package.json')) { Copy-Item -LiteralPath "$project\$name" -Destination $output }
 Copy-Item -LiteralPath "$project\docs\portable-app.md" -Destination "$output\使用说明.md"

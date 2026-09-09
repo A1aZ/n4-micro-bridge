@@ -14,7 +14,7 @@
 
 1. 执行 scripts/test.ps1；失败停止构建。
 2. 执行 scripts/build-portable.ps1 -NodePath <node.exe> -PythonPath <venv-python.exe>。只使用公开示例，不读取个人配置。
-3. 新目录执行 Mirabox.exe --self-test，检查 logs/selftest-result.txt。
+3. 新目录执行 N4Bridge.exe --self-test，检查 logs/selftest-result.txt。
 4. 在无开发环境的机器测试启动/退出、端口冲突、驱动和设备连接。
 
 这是可重复的构建步骤，不宣称字节级可复现。Python运行时从显式指定的环境复制，必须使用干净构建环境。不能把本地候选包未经审计就公开。

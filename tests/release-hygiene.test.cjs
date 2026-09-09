@@ -9,6 +9,8 @@ test('public example never inherits a user-confirmed reasoning binding',()=>{
 test('release construction uses example config and excludes private inspection script',()=>{
  const build=fs.readFileSync(path.join(root,'scripts/build-portable.ps1'),'utf8');
  assert(build.includes('examples\\n4-calibrated.json'));
+ assert(build.includes('$output\\N4Bridge.exe'));
+ assert(!build.includes('$output\\Mirabox.exe'));
  assert(!build.includes('$project\\data\\config.json'));
  const exporter=fs.readFileSync(path.join(root,'scripts/export-source.cjs'),'utf8');
  assert(exporter.includes('inspect-asar.cjs'));
