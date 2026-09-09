@@ -562,8 +562,8 @@ class LibUSBHIDAPI:
     def refresh_screen(self) -> None:
         """Refresh the screen display."""
         if not self._handle:
-            return
-        _transport_lib.transport_refresh(self._handle)
+            raise RuntimeError('Cannot refresh: transport is closed')
+        return _transport_lib.transport_refresh(self._handle)
 
     def sleep(self) -> None:
         """Put the device into sleep mode."""
@@ -643,8 +643,8 @@ class LibUSBHIDAPI:
             timeout_ms: Transmission timeout in milliseconds
         """
         if not self._handle:
-            return
-        _transport_lib.transport_set_background_image_stream(
+            raise RuntimeError('Cannot set background: transport is closed')
+        return _transport_lib.transport_set_background_image_stream(
             self._handle, jpeg_data, len(jpeg_data), timeout_ms
         )
 
@@ -1332,7 +1332,7 @@ class LibUSBHIDAPI:
 
             with open(path, "rb") as f:
                 jpeg_data = f.read()
-            self.set_background_image_stream(jpeg_data)
+            return self.set_background_image_stream(jpeg_data)
         except Exception as e:
             raise RuntimeError(f"Failed to load image from {path}: {e}")
 
@@ -1429,4 +1429,4 @@ class LibUSBHIDAPI:
 
     def refresh(self) -> None:
         """Legacy method: Refresh the display."""
-        self.refresh_screen()
+        return self.refresh_screen()

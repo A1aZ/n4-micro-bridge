@@ -1517,6 +1517,11 @@ const server = http.createServer(async (req, res) => {
   const requestUrl = new URL(req.url, 'http://127.0.0.1');
   const route = requestUrl.pathname;
   try {
+    if(route.startsWith('/api/')){
+      const {assertLocalRequest,assertMutation}=require('../src/local-api-guard.cjs');
+      assertLocalRequest(req,port);
+      if(!['GET','HEAD','OPTIONS'].includes(req.method)||(route==='/api/transport/input'&&requestUrl.searchParams.get('drain')!=='0'))assertMutation(req);
+    }
     if(req.method==='GET' && route==='/screen-test'){
       res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});
       return res.end(fs.readFileSync(path.join(root,'screen-test.html')));

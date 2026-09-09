@@ -146,6 +146,10 @@ test('WebUI smoke: config/API, bridge report, SSE synthetic release, and page sc
   });
 
   await waitForServer(base, child);
+  const untrustedPost=await fetch(`${base}/api/bridge/event`,{method:'POST',headers:{Origin:'https://example.invalid','content-type':'text/plain'},body:'{"key":"AG00","act":1}'});
+  assert.equal(untrustedPost.status,403);
+  const untrustedDrain=await fetch(`${base}/api/transport/input`,{headers:{Origin:'https://example.invalid'}});
+  assert.equal(untrustedDrain.status,403);
 
   const page = await request(base, '/config');
   assert.equal(page.response.status, 200);

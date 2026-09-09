@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — review fixes
+
+- Apply loopback Host/Origin/Fetch-Metadata checks across APIs and require JSON mutation bodies; protect queue-draining GET requests from navigation.
+- Propagate display refresh/background transport errors and reject unsigned SDK errors before committing display caches.
+- Poll N4 native readiness separately from Node/Relay process liveness in launcher and tray.
+
 ## 0.1.0-rc.2 — source-only licensing and launcher design
 
 - Original application licensed AGPL-3.0-only, copyright A1aZ; separately built driver retains MS-PL.

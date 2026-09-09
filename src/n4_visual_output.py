@@ -412,7 +412,7 @@ class N4VisualOutput:
     def _check_upload_result(value: Any, operation: str) -> Any:
         """Treat the upstream SDK's conventional negative return as failure."""
 
-        if isinstance(value, (int, float)) and not isinstance(value, bool) and value < 0:
+        if isinstance(value, (int, float)) and not isinstance(value, bool) and (value < 0 or value >= 0x01000000):
             raise RuntimeError(f"N4 SDK {operation} failed with status {value}")
         return value
 

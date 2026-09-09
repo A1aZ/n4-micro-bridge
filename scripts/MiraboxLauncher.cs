@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using System.Web.Script.Serialization;
 
 class MiraboxLauncher : Form {
     readonly string root = AppDomain.CurrentDomain.BaseDirectory;
@@ -18,6 +20,7 @@ class MiraboxLauncher : Form {
     NotifyIcon tray; ContextMenuStrip trayMenu;
     readonly System.Windows.Forms.Timer serviceTimer=new System.Windows.Forms.Timer {Interval=2000};
     bool exitRequested, trayNoticeShown; readonly bool trayEnabled;
+    bool checkingDevice; string deviceSummary="等待设备";
     [DllImport("kernel32.dll", CharSet=CharSet.Unicode)] static extern IntPtr CreateJobObject(IntPtr a,string n);
     [DllImport("kernel32.dll")] static extern bool AssignProcessToJobObject(IntPtr j,IntPtr p);
     [DllImport("kernel32.dll")] static extern bool TerminateJobObject(IntPtr j,uint c);
@@ -63,7 +66,27 @@ class MiraboxLauncher : Form {
         web.Click+=(s,e)=>OpenControlPage();
         logs.Click+=(s,e)=>{Directory.CreateDirectory(Path.Combine(root,"logs")); Process.Start("explorer.exe", "\""+Path.Combine(root,"logs")+"\"");};
         if(trayEnabled)EnsureTray();
-        serviceTimer.Tick+=(s,e)=>{if(!busy && server!=null && (server.HasExited || (relay!=null && relay.HasExited))) {StopAll(); status.Text="服务已退出。请查看 logs 中的日志，再点击启动。若旧 Relay 仍运行，请先关闭旧命令窗口。";if(tray!=null&&!Visible)tray.ShowBalloonTip(4000,"N4 Bridge","服务已停止，双击托盘图标查看原因。",ToolTipIcon.Warning);}if(tray!=null)tray.Text=busy?"N4 Bridge · 正在处理":server!=null?"N4 Bridge · 服务运行中":"N4 Bridge · 服务已停止";};serviceTimer.Start();
+        serviceTimer.Tick+=async (s,e)=>{if(!busy && server!=null && (server.HasExited || (relay!=null && relay.HasExited))) {StopAll(); status.Text="服务已退出。请查看 logs 中的日志，再点击启动。若旧 Relay 仍运行，请先关闭旧命令窗口。";if(tray!=null&&!Visible)tray.ShowBalloonTip(4000,"N4 Bridge","服务已停止，双击托盘图标查看原因。",ToolTipIcon.Warning);}await CheckDeviceStatus();if(tray!=null)tray.Text=busy?"N4 Bridge · 正在处理":server!=null?"N4 Bridge · "+deviceSummary:"N4 Bridge · 服务已停止";};serviceTimer.Start();
+    }
+    static bool Flag(Dictionary<string,object> obj,string key){object v;return obj!=null&&obj.TryGetValue(key,out v)&&v is bool&&(bool)v;}
+    static string DeviceSummary(Dictionary<string,object> data){
+        object v;var state=data.TryGetValue("status",out v)?Convert.ToString(v):"unknown";
+        var n4=data.TryGetValue("n4",out v)?v as Dictionary<string,object>:null;
+        if(Flag(data,"stale"))return "设备状态已失联";
+        if(state=="error"||state=="stopped")return "N4 未连接";
+        if(state=="running"&&Flag(n4,"opened")&&Flag(n4,"ready"))return "N4 已连接";
+        return "等待 N4 就绪";
+    }
+    async Task CheckDeviceStatus(){
+        if(busy||checkingDevice||server==null||exitRequested)return;
+        var owner=server;checkingDevice=true;
+        try{var raw=await Task.Run(()=>Request("/api/native/status"));
+            if(IsDisposed||busy||exitRequested||server!=owner)return;
+            var data=new JavaScriptSerializer().Deserialize<Dictionary<string,object>>(raw);
+            deviceSummary=DeviceSummary(data);object error;
+            status.Text=deviceSummary+"。"+(data.TryGetValue("lastError",out error)&&error!=null?Convert.ToString(error):"可通过控制页查看详细状态。")+"\n"+url;
+        }catch{if(!IsDisposed&&!busy&&!exitRequested&&server==owner){deviceSummary="设备状态不可用";status.Text="无法读取 N4 状态，请打开控制页检查。";}}
+        finally{checkingDevice=false;}
     }
     void OpenControlPage(){if(url!=null&&server!=null&&!server.HasExited)Process.Start(url+"/real-n4");else {RestoreWindow();status.Text="服务尚未启动，请先点击“启动全部”。";}}
     void RestoreWindow(){ShowInTaskbar=true;Show();WindowState=FormWindowState.Normal;Activate();}
@@ -129,6 +152,10 @@ class MiraboxLauncher : Form {
     void StopAll() {if(job!=IntPtr.Zero){TerminateJobObject(job,0);CloseHandle(job);job=IntPtr.Zero;} if(server!=null)server.Dispose();if(relay!=null)relay.Dispose();server=null;relay=null;status.Text="已停止本启动器的服务。可以重新启动。";}
     void SelfTest() {
         try {
+            var parser=new JavaScriptSerializer();
+            if(DeviceSummary(parser.Deserialize<Dictionary<string,object>>("{\"status\":\"error\",\"n4\":{\"opened\":true,\"ready\":true}}"))!="N4 未连接")throw new Exception("Failed N4 incorrectly marked connected");
+            if(DeviceSummary(parser.Deserialize<Dictionary<string,object>>("{\"status\":\"running\",\"stale\":true,\"n4\":{\"opened\":true,\"ready\":true}}"))!="设备状态已失联")throw new Exception("Stale N4 incorrectly marked connected");
+            if(DeviceSummary(parser.Deserialize<Dictionary<string,object>>("{\"status\":\"running\",\"n4\":{\"opened\":true,\"ready\":true}}"))!="N4 已连接")throw new Exception("Ready N4 classification failed");
             Directory.CreateDirectory(Path.Combine(root,"logs"));
             var probe=new TcpListener(IPAddress.Loopback,0);probe.Start();int port=((IPEndPoint)probe.LocalEndpoint).Port;probe.Stop();url="http://127.0.0.1:"+port;
             job=CreateJobObject(IntPtr.Zero,null);var limits=new Limits();limits.basic.flags=0x2000;

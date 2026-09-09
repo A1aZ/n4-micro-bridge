@@ -306,7 +306,7 @@ class StreamDock(ABC):
 
     # Refresh the device display
     def refresh(self):
-        self.transport.refresh()
+        return self.transport.refresh()
 
     def image_keys(self):
         """Return logical key numbers that support key images."""
