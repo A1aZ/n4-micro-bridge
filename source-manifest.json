@@ -900,13 +900,13 @@
     },
     {
       "path": "src/n4-theme-svg.cjs",
-      "bytes": 9823,
-      "sha256": "df2836fc8a041fff36415755a666b9ca296d98af3f8ef05535ef6c87578d96f4"
+      "bytes": 11076,
+      "sha256": "903d7ac8b275596ee27ecbfb3643303406482d627e2cee332c2d7fc3a60c6f95"
     },
     {
       "path": "src/n4-visuals.cjs",
-      "bytes": 29150,
-      "sha256": "08e900a578c18a656f5ad5d49aecd48d33d2d4a02745cf90cf8c588fe834bc4e"
+      "bytes": 29744,
+      "sha256": "1deeeb4deb0f21634b7c478d9180359537c5f66ebf878be8c8e0b5100bf2d8ee"
     },
     {
       "path": "src/n4_frame_cache.py",
@@ -930,8 +930,8 @@
     },
     {
       "path": "src/n4_themes.py",
-      "bytes": 9020,
-      "sha256": "bd9105229d9915862aee361ccacb94af4144a1dcc902243c29af2a21baeb7458"
+      "bytes": 10012,
+      "sha256": "35c14c45d09d7328459ddab8e27ff481c1abf2ea35830a6970608f7ab545db06"
     },
     {
       "path": "src/n4_visual_output.py",
@@ -940,8 +940,8 @@
     },
     {
       "path": "src/n4_visual_renderer.py",
-      "bytes": 38394,
-      "sha256": "d3625c5dc61f03081e35844dc456e0eea2f46abd6de5c028aab458cadc796ac4"
+      "bytes": 39323,
+      "sha256": "9bed76e5fdccdefef047b85a608dd9d5697544e26fd8fbaffedd417017d5d043"
     },
     {
       "path": "src/n4_webui_bridge.py",
@@ -1005,8 +1005,8 @@
     },
     {
       "path": "tests/info-strip.test.cjs",
-      "bytes": 1911,
-      "sha256": "01abb63f324f92f1696b504cd36b9792d75147376d5dcd27a682f512dfdc10db"
+      "bytes": 2144,
+      "sha256": "81e6dd2bbec95b077b70b25c180adc3caa2aae5872837f7f39e7fa4901341ee4"
     },
     {
       "path": "tests/launcher-browser.test.cjs",
@@ -1090,8 +1090,8 @@
     },
     {
       "path": "tests/strip-fast-key.test.cjs",
-      "bytes": 1806,
-      "sha256": "1a2954b856c2aac9995f5604bf0bc8575c2111bcc766ab209ba92a87cf3f2bce"
+      "bytes": 1861,
+      "sha256": "9e945f9082356c8a2e274276d9222671a747c7f759bdebaa1cb69e4245c99dea"
     },
     {
       "path": "tests/test_agent_feedback.py",
@@ -1200,8 +1200,8 @@
     },
     {
       "path": "tests/test_strip_fast_icon.py",
-      "bytes": 1616,
-      "sha256": "c0c868d21a9eba626e527f37c6ba61c4145d8b806c160c638754684b43f14855"
+      "bytes": 1673,
+      "sha256": "5ab20b48d758917bf34cbccadc0821073815c32b709d2641d7f5ec708506a8bd"
     },
     {
       "path": "tests/test_unsigned_display_error.py",
@@ -1210,8 +1210,8 @@
     },
     {
       "path": "tests/test_visual_refresh_performance.py",
-      "bytes": 4272,
-      "sha256": "a129fc993dc25228cf721079ecaa2f8ecdc8651f39b83ce713f1ed392b0dbf6e"
+      "bytes": 4434,
+      "sha256": "db53afc307a2b967f7fbb2855b99290b717bfde8ef31192909788a7c04a726bf"
     },
     {
       "path": "tests/theme-config.test.cjs",

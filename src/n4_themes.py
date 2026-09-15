@@ -106,45 +106,58 @@ def render_info_strip(index,knob,brightness,font,fast_touch=False,clock=None):
         touch_action={'targetKey':'ACT06','eyebrow':'快捷','label':'加速','scope':'strip'}
     if not knob.get('enabled',True):detail='已停用'
     image=Image.new('RGB',(176,112),BG);draw=ImageDraw.Draw(image)
-    if index == 0 and isinstance(clock, dict) and clock.get('time') and clock.get('date'):
-        draw.rounded_rectangle((1,1,174,110),radius=8,outline=(46,59,76))
-        # The left-most strip is the one glance-away status area.  Keep the
-        # first knob's role as a small hint while giving the clock enough
-        # contrast and pixels to remain legible on the physical 176x112 lens.
-        draw.text((12,15),'当前时间',font=font(11),fill=MUTED,anchor='lm')
-        date_text=str(clock['date']) + (f" · {clock['weekday']}" if clock.get('weekday') else '')
-        draw.text((164,15),date_text,font=font(10),fill=MUTED,anchor='ra')
-        draw.text((12,61),str(clock['time']),font=font(35),fill=FG,anchor='lm')
-        symbol=asset(CATALOG['knobIcons'][mode]).resize((18,18),Image.Resampling.LANCZOS)
-        image.paste(symbol,(12,80),symbol)
-        hint='旋钮 1 · 已停用' if not knob.get('enabled',True) else f'旋钮 1 · {title}' if title else '旋钮 1'
-        draw.text((38,94),hint,font=font(11),fill=MUTED,anchor='lm')
-        return image
-    if touch_action:
+    panel=knob.get('panel')
+    if not isinstance(panel,dict):
+        panel={'kind':'clock','clock':clock} if index==0 and isinstance(clock,dict) else {'kind':'action','action':touch_action} if touch_action else {'kind':'knob'}
+    kind=panel.get('kind')
+    if kind=='clock' and isinstance(panel.get('clock'),dict):
+        value=panel['clock']
+        draw.rounded_rectangle((1,1,174,77),radius=8,fill=BG,outline=(46,59,76))
+        draw.text((12,15),'当前时间',font=font(10),fill=MUTED,anchor='lm')
+        date_text=str(value.get('date','')) + (f" · {value['weekday']}" if value.get('weekday') else '')
+        draw.text((164,15),date_text,font=font(9),fill=MUTED,anchor='rm')
+        draw.text((12,53),str(value.get('time','')),font=font(34),fill=FG,anchor='lm')
+    elif kind=='agents' and isinstance(panel.get('agents'),list):
+        draw.rounded_rectangle((1,1,174,77),radius=8,fill=BG,outline=(46,59,76))
+        start=panel.get('start',0) if isinstance(panel.get('start'),int) else 0
+        agents=panel['agents'][:3]
+        draw.text((12,15),'Agent 状态',font=font(10),fill=MUTED,anchor='lm')
+        draw.text((164,15),f'{start+1:02}–{start+len(agents):02}',font=font(9),fill=MUTED,anchor='rm')
+        for offset,agent in enumerate(agents):
+            value=agent if isinstance(agent,dict) else {}
+            cx=31+offset*57
+            rgb=int(value.get('c',0) or 0)&0xffffff
+            visibility=max(0.0,min(1.0,float(value.get('b',0) or 0))) if int(value.get('e',0) or 0)!=0 else 0.0
+            colour=((rgb>>16)&255,(rgb>>8)&255,rgb&255) if rgb else (65,78,94)
+            fill=tuple(round(channel*(.35+.65*visibility)) for channel in colour) if rgb else colour
+            draw.ellipse((cx-8,31,cx+8,47),fill=fill,outline=colour if rgb else (89,104,123),width=2)
+            draw.text((cx,62),f'{start+offset+1:02}',font=font(12),fill=FG,anchor='mm')
+    elif kind=='action' and (isinstance(panel.get('action'),dict) or touch_action):
         # The N4 reports only one hardware code for this whole 176x112 strip,
-        # without touch coordinates.  The two surfaces are therefore visual
-        # hierarchy, not two independently clickable controls.
-        draw.rounded_rectangle((1,1,104,110),radius=8,outline=(46,59,76))
-        draw.text((10,15),f'旋钮 {index+1}',font=font(11),fill=MUTED,anchor='lm')
-        symbol=asset(CATALOG['knobIcons'][mode]).resize((24,24),Image.Resampling.LANCZOS)
-        image.paste(symbol,(10,35),symbol)
-        if title:draw.text((42,50),title,font=font(15),fill=FG,anchor='lm')
-        split_detail='已停用' if not knob.get('enabled',True) else {
-            'micro':'Codex 控制',
-            'scroll':'聊天区',
-            'reasoning':'− / +' if knob.get('reasoningConfigured') else '待绑定',
-            'brightness':f'{brightness}%' if brightness is not None else '每格 5%',
-        }[mode]
-        draw.text((53,89),split_detail,font=font(12),fill=MUTED,anchor='mm')
-        draw.rounded_rectangle((113,1,174,110),radius=8,fill=(35,30,20),outline=(124,98,40))
-        draw.text((144,15),str(touch_action.get('eyebrow','快捷')),font=font(10),fill=(184,163,108),anchor='mm')
-        draw.polygon([(146,29),(128,58),(140,58),(134,83),(161,49),(148,49)],fill=(255,210,90))
-        draw.text((144,94),str(touch_action.get('label','加速')),font=font(12),fill=FG,anchor='mm')
-        return image
-    draw.rounded_rectangle((1,1,174,110),radius=8,outline=(46,59,76))
-    draw.text((12,15),f'旋钮 {index+1}',font=font(11),fill=MUTED,anchor='lm')
-    symbol=asset(CATALOG['knobIcons'][mode]).resize((25,25),Image.Resampling.LANCZOS)
-    image.paste(symbol,(12,39),symbol)
-    if title:draw.text((47,52),title,font=font(17),fill=FG,anchor='lm')
-    draw.text((88,89),detail,font=font(12),fill=MUTED,anchor='mm')
+        # without touch coordinates.  Only this upper panel advertises the
+        # real action; the bottom rail is a passive physical-knob legend.
+        action=panel.get('action') if isinstance(panel.get('action'),dict) else touch_action
+        draw.rounded_rectangle((1,1,174,77),radius=8,fill=(35,30,20),outline=(124,98,40))
+        draw.text((12,15),f"{action.get('eyebrow','快捷')}操作",font=font(10),fill=(184,163,108),anchor='lm')
+        draw.polygon([(48,15),(32,42),(43,42),(38,66),(62,35),(51,35)],fill=(255,210,90))
+        draw.text((82,42),str(action.get('label','加速')),font=font(22),fill=FG,anchor='lm')
+        draw.text((82,62),'触摸触发',font=font(10),fill=(184,163,108),anchor='lm')
+    else:
+        draw.rounded_rectangle((1,1,174,77),radius=8,fill=BG,outline=(46,59,76))
+        symbol=asset(CATALOG['knobIcons'][mode]).resize((26,26),Image.Resampling.LANCZOS)
+        image.paste(symbol,(14,25),symbol)
+        if title:draw.text((51,39),title,font=font(16),fill=FG,anchor='lm')
+        draw.text((88,62),detail,font=font(11),fill=MUTED,anchor='mm')
+    draw.rounded_rectangle((1,84,174,110),radius=7,fill=BG,outline=(46,59,76))
+    symbol=asset(CATALOG['knobIcons'][mode]).resize((16,16),Image.Resampling.LANCZOS)
+    image.paste(symbol,(8,89),symbol)
+    knob_hint=f'旋钮 {index+1} · 已停用' if not knob.get('enabled',True) else f'旋钮 {index+1} · {title}' if title else f'旋钮 {index+1}'
+    knob_value='' if not knob.get('enabled',True) else {
+        'micro':'',
+        'scroll':'',
+        'reasoning':'− / +' if knob.get('reasoningConfigured') else '待绑定',
+        'brightness':f'{brightness}%' if brightness is not None else '5% / 格',
+    }[mode]
+    draw.text((31,97),knob_hint,font=font(10),fill=MUTED,anchor='lm')
+    if knob_value:draw.text((165,97),knob_value,font=font(11),fill=FG,anchor='rm')
     return image

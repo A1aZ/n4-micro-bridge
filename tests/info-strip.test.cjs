@@ -7,6 +7,9 @@ test('information strip renders four roles and consumes former shortcut touches'
  const model=createN4RenderModel({config:c});
  for(const code of [0x40,0x41,0x42,0x43])assert.deepEqual(mapN4HardwareEvent(code,1,c),[]);
  assert.ok(!model.buttons[10].svg.includes('导航'));
+ for(const button of model.buttons.slice(10))assert.match(button.svg,/data-strip-layout="dashboard"/);
+ assert.match(model.buttons[11].svg,/data-panel-kind="agents"/);
+ assert.match(model.buttons[12].svg,/data-panel-kind="agents"/);
  ['聊天滚动','推理强度','亮度'].forEach((label,i)=>assert.ok(model.buttons[11+i].svg.includes(label)));
  assert.ok(model.buttons[12].svg.includes('待绑定'));assert.ok(!model.buttons[13].svg.includes('100%'));
  const live=createN4RenderModel({config:c,localActions:{brightness:65,brightnessApplied:true}});

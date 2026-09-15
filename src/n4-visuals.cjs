@@ -485,8 +485,23 @@ function stripTouchAction(binding, index) {
     label: '加速',
     icon: 'lightning',
     scope: 'strip',
-    layout: 'split',
+    layout: 'stacked',
   };
+}
+
+function stripPanel(index, lighting, phase, clock, touchAction) {
+  const stripIndex = index - 10;
+  if (stripIndex === 0) return {kind: 'clock', clock};
+  if (stripIndex === 1 || stripIndex === 2) {
+    const start = (stripIndex - 1) * 3;
+    return {
+      kind: 'agents',
+      start,
+      agents: lighting.agents.slice(start, start + 3).map(light => describeLight(light, phase)),
+    };
+  }
+  if (stripIndex === 3 && touchAction) return {kind: 'action', action: touchAction};
+  return {kind: 'knob'};
 }
 
 /**
@@ -502,8 +517,9 @@ function createN4RenderModel(options = {}) {
     const position = buttonPosition(index);
     const source = sourceLightForTarget(binding.targetKey, lighting);
     const light = describeLight(binding.enabled ? source.light : LIGHT_DEFAULT, phase);
+    const touchAction = stripTouchAction(binding, index);
     const button = {
-      knobInfo:index>=10&&config.visual.stripMode==='knobs'?{index:index-10,...config.knobs[index-10],touchAction:stripTouchAction(binding,index),brightness:options.localActions?.brightnessApplied===true?options.localActions.brightness:null,clock:index===10?clock:null}:null,
+      knobInfo:index>=10&&config.visual.stripMode==='knobs'?{index:index-10,...config.knobs[index-10],touchAction,brightness:options.localActions?.brightnessApplied===true?options.localActions.brightness:null,clock:index===10?clock:null,panel:stripPanel(index,lighting,phase,clock,touchAction)}:null,
       theme: config.visual.theme,
       index: index + 1,
       id: binding.id,

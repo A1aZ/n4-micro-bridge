@@ -55,7 +55,9 @@ class RefreshTests(unittest.TestCase):
             frame=out.render_once()
             self.assertTrue(frame['ok'])
             self.assertEqual(frame['performance']['renderedKeys'],14)
-            self.assertEqual([x['logicalKey'] for x in frame['uploads']],[1])
+            # A real agent colour/state change updates both its main key and
+            # the passive 01–03 overview. Animation phase alone stays on key 1.
+            self.assertEqual([x['logicalKey'] for x in frame['uploads']],[1,12])
             self.assertEqual(out.render_once()['uploads'],[])
         finally:out.stop()
 

@@ -87,6 +87,21 @@ DISABLED = (41, 51, 67)
 CLOCK_WEEKDAYS = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
 
 
+def _strip_panel(index: int, lighting: Any, clock: Any, touch_action: Any = None) -> dict[str, Any]:
+    if index == 0:
+        return {"kind": "clock", "clock": clock}
+    if index in (1, 2):
+        start = (index - 1) * 3
+        return {
+            "kind": "agents",
+            "start": start,
+            "agents": [light.as_dict() for light in lighting.agents[start:start + 3]],
+        }
+    if index == 3 and isinstance(touch_action, Mapping):
+        return {"kind": "action", "action": dict(touch_action)}
+    return {"kind": "knob"}
+
+
 def _require_pillow() -> None:
     if Image is None:
         message = (
@@ -810,8 +825,11 @@ class N4VisualRenderer:
                 index=binding.index-11
                 raw_knob=self.knobs[index] if index<len(self.knobs) else {}
                 knob=dict(raw_knob) if isinstance(raw_knob,Mapping) else {}
+                touch_action=None
                 if index==3 and binding.enabled and binding.target_key=='ACT06':
-                    knob['touchAction']={'targetKey':'ACT06','eyebrow':'快捷','label':'加速','icon':'lightning','scope':'strip','layout':'split'}
+                    touch_action={'targetKey':'ACT06','eyebrow':'快捷','label':'加速','icon':'lightning','scope':'strip','layout':'stacked'}
+                    knob['touchAction']=touch_action
+                knob['panel']=_strip_panel(index,lighting,clock_value if index==0 else None,touch_action)
                 key_images.append(render_info_strip(index,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),clock=clock_value if index==0 else None))
             else:
                 key_images.append(_render_key_image(binding, light, source_name, font_path=self.font_path, theme=self.theme,phase=phase_value))
@@ -851,15 +869,19 @@ class N4VisualRenderer:
         if not isinstance(index, int) or not 1 <= index <= KEY_COUNT:
             raise ValueError(f"key index must be between 1 and {KEY_COUNT}")
         phase_value = _clamp(_number(phase, 0.5), 0.0, 1.0)
+        lighting = normalize_lighting(source, phase=phase_value, strict=self.strict)
         configured = self.bindings[index - 1]
         if target_override is None and self.strip_mode=='knobs' and index>10:
             from n4_themes import render_info_strip
             raw_knob=self.knobs[index-11] if index-11<len(self.knobs) else {}
             knob=dict(raw_knob) if isinstance(raw_knob,Mapping) else {}
+            touch_action=None
             if index==14 and configured.enabled and configured.target_key=='ACT06':
-                knob['touchAction']={'targetKey':'ACT06','eyebrow':'快捷','label':'加速','icon':'lightning','scope':'strip','layout':'split'}
-            return render_info_strip(index-11,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),clock=normalize_clock(clock) if index==11 else None)
-        lighting = normalize_lighting(source, phase=phase_value, strict=self.strict)
+                touch_action={'targetKey':'ACT06','eyebrow':'快捷','label':'加速','icon':'lightning','scope':'strip','layout':'stacked'}
+                knob['touchAction']=touch_action
+            clock_value=normalize_clock(clock) if index==11 else None
+            knob['panel']=_strip_panel(index-11,lighting,clock_value,touch_action)
+            return render_info_strip(index-11,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),clock=clock_value)
         target = None if target_override is False else str(target_override)
         binding = configured if target_override is None else KeyBinding(
             index=configured.index,
