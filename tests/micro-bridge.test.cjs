@@ -74,6 +74,25 @@ test('one-shot knob press emits now and schedules a release', () => {
   assert.equal(bridge.snapshot().pendingReleases, 0);
 });
 
+test('state-zero information-strip touch becomes an ACT06 click', () => {
+  const clock = fakeClock();
+  const config = defaultConfig();
+  config.visual.stripMode = 'knobs';
+  config.buttons[13].targetKey = 'ACT06';
+  config.buttons[13].enabled = true;
+  const bridge = new MicroBridge({config, schedule: clock.schedule, cancel: clock.cancel});
+  assert.deepEqual(bridge.handleHardwareEvent(0x43, 0), [
+    {method: 'v.oai.hid', params: {k: 'ACT06', act: 1}},
+  ]);
+  assert.equal(clock.timers.length, 1);
+  assert.equal(clock.timers[0].delay, 100);
+  clock.run(clock.timers[0]);
+  assert.deepEqual(bridge.drain().map((event) => event.params), [
+    {k: 'ACT06', act: 1},
+    {k: 'ACT06', act: 0},
+  ]);
+});
+
 test('a real release report cancels the synthetic timer and is not duplicated', () => {
   const clock = fakeClock();
   const bridge = new MicroBridge({schedule: clock.schedule, cancel: clock.cancel});

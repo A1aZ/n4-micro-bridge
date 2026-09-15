@@ -1,6 +1,7 @@
 import pathlib
 import sys
 import unittest
+from datetime import datetime
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -207,6 +208,39 @@ class N4VisualOutputTests(unittest.TestCase):
             self.assertTrue(second_directory.exists())
             self.assertNotEqual(first_directory, second_directory)
             self.assertTrue(renderer.flush(timeout=3))
+        finally:
+            renderer.stop()
+
+    def test_clock_refreshes_only_when_the_minute_changes(self):
+        fake = FakeN4()
+        current = [datetime(2026, 9, 15, 9, 7, 12)]
+        renderer = N4VisualOutput(
+            fake,
+            refresh_ms=40,
+            status_stream=None,
+            now=lambda: current[0],
+        )
+        try:
+            renderer.apply_snapshot({
+                "lighting": {},
+                "model": {
+                    "stripMode": "knobs",
+                    "knobs": [{"mode": "micro"} for _ in range(4)],
+                },
+            })
+            self.assertTrue(renderer.render_once(force=True)["ok"])
+            first = len(fake.keys)
+            self.assertTrue(renderer.render_once()["ok"])
+            self.assertEqual(len(fake.keys), first)
+            current[0] = current[0].replace(minute=8)
+            minute_tick = renderer.render_once()
+            self.assertTrue(minute_tick["ok"])
+            self.assertEqual(
+                [upload.get("logicalKey") for upload in minute_tick["uploads"]],
+                [11],
+            )
+            self.assertEqual(len(fake.keys), first + 1)
+            self.assertEqual(len(fake.screens), 1)
         finally:
             renderer.stop()
 

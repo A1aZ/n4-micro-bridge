@@ -11,3 +11,15 @@ test('information strip renders four roles and consumes former shortcut touches'
  assert.ok(live.buttons[13].svg.includes('65%'));
  c.visual.stripMode='buttons';assert.equal(mapN4HardwareEvent(0x40,1,c)[0].params.k,'ACT10');
 });
+
+test('left information strip shows a deterministic clock and keeps knob hint',()=>{
+ const c=defaultConfig();c.visual.stripMode='knobs';
+ const model=createN4RenderModel({
+   config:c,
+   clock:{time:'09:07',date:'2026-09-15',weekday:'周二'},
+ });
+ assert.match(model.buttons[10].svg,/data-strip-clock/);
+ assert.match(model.buttons[10].svg,/09:07/);
+ assert.match(model.buttons[10].svg,/2026-09-15/);
+ assert.match(model.buttons[10].svg,/旋钮 1 · 导航/);
+});

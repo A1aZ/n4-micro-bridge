@@ -5,6 +5,9 @@
 - Apply loopback Host/Origin/Fetch-Metadata checks across APIs and require JSON mutation bodies; protect queue-draining GET requests from navigation.
 - Propagate display refresh/background transport errors and reject unsigned SDK errors before committing display caches.
 - Poll N4 native readiness separately from Node/Relay process liveness in launcher and tray.
+- Rework the lower information strip with local time/date, four distinct knob roles and an explicit right-most ACT06 lightning touch target.
+- Guide first-time reasoning-knob setup without overwriting existing user mappings.
+- Refresh the clock once per minute, upload only changed display regions and keep animated WebUI render caching bounded.
 
 ## 0.1.0-rc.2 — source-only licensing and launcher design
 

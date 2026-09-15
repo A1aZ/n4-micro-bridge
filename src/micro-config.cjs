@@ -279,6 +279,18 @@ function buttonBinding(config, hardwareCode) {
   return config.buttons.find((entry) => entry.enabled && entry.hardwareCode === hardwareCode) || null;
 }
 
+function fastTouchBinding(config, hardwareCode) {
+  if (config.visual.stripMode !== 'knobs') return null;
+  const index = config.buttons.findIndex((entry) => entry.enabled && entry.hardwareCode === hardwareCode);
+  // The N4 secondary screen is split into four touch zones.  In information
+  // strip mode only the right-most zone is a real Micro action; the other
+  // zones are display-only.  Firmware reports this touch as a one-shot
+  // state=0 packet (there is no separate release packet).
+  if (index !== 13) return null;
+  const binding = config.buttons[index];
+  return binding.targetKey === 'ACT06' ? binding : null;
+}
+
 function knobBinding(config, field, hardwareCode) {
   return config.knobs.find((entry) => entry.enabled && entry.hardware?.[field] === hardwareCode) || null;
 }
@@ -317,9 +329,23 @@ function mapN4HardwareEvent(hardwareCode, state = 0, config = defaultConfig()) {
     return [event];
   }
 
+  const fastTouch = fastTouchBinding(cfg, code);
+  if (fastTouch && state === 0x00) {
+    const event = eventForKey(fastTouch.targetKey, 1);
+    if (cfg.release.synthesize) {
+      return [
+        event,
+        {...eventForKey(fastTouch.targetKey, 0), meta: {synthetic: true, delayMs: cfg.release.delayMs}},
+      ];
+    }
+    return [event];
+  }
+
   const button = buttonBinding(cfg, code);
   if (!button) return [];
-  if(cfg.visual.stripMode==='knobs'&&cfg.buttons.indexOf(button)>=10)return [];
+  if(cfg.visual.stripMode==='knobs'&&cfg.buttons.indexOf(button)>=10){
+    if(cfg.buttons.indexOf(button)!==13||button.targetKey!=='ACT06')return [];
+  }
   const action = state === 0x01 ? 1 : 0;
   return [eventForKey(button.targetKey, action)];
 }

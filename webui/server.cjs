@@ -25,10 +25,12 @@ const {
 const {decodeN4Report} = require('../src/n4-input.cjs');
 const {MicroBridge} = require('../src/micro-bridge.cjs');
 const {MicroTransportHub} = require('../src/micro-transport.cjs');
+const {MinuteVisualModelCache} = require('../src/visual-model-cache.cjs');
 const {
   createLightingState,
   applyMicroMessage,
   createN4RenderModel,
+  normalizeClock,
   renderPreviewHtml,
   buildSdkImagePlan,
 } = require('../src/n4-visuals.cjs');
@@ -118,7 +120,8 @@ function savePersistedConfig(file, value) {
 let config = loadPersistedConfig(configFile);
 let bridge;
 let visualLighting = createLightingState();
-let visualModel = createN4RenderModel({config, lighting: visualLighting});
+let visualModel = null;
+let visualModelCache = null;
 let screenTest = {mode:'off',revision:0,expiresAt:0};
 function screenTestSnapshot(){
   if(screenTest.mode!=='off' && Date.now()>=screenTest.expiresAt)screenTest={mode:'off',revision:screenTest.revision+1,expiresAt:0};
@@ -1435,8 +1438,29 @@ function eventEnvelope(event, source = 'n4') {
   };
 }
 
-function refreshVisualModel(phase = 0.5) {
-  visualModel = createN4RenderModel({config, lighting: visualLighting, phase,localActions:nativeBridge.n4.localActions});
+function modelCache() {
+  if (!visualModelCache) {
+    visualModelCache = new MinuteVisualModelCache({
+      clock: () => normalizeClock(),
+      build: (phase, clock) => createN4RenderModel({
+        config,
+        lighting: visualLighting,
+        phase,
+        clock,
+        localActions: nativeBridge.n4.localActions,
+      }),
+    });
+  }
+  return visualModelCache;
+}
+
+function refreshVisualModel(phase = visualModel?.phase ?? 0.5) {
+  visualModel = modelCache().refresh(phase);
+  return visualModel;
+}
+
+function currentVisualModel() {
+  visualModel = modelCache().get(visualModel?.phase ?? 0.5);
   return visualModel;
 }
 
@@ -1444,11 +1468,14 @@ function refreshVisualModel(phase = 0.5) {
 // a nested model for transport/RPC consumers that treat visual state as an
 // envelope.  Both forms describe the same snapshot and remain JSON-safe.
 function visualSnapshot() {
+  // Checking the minute is cheap; the SVG model is reused until the clock
+  // crosses a minute boundary or state/configuration explicitly invalidates it.
+  const model = currentVisualModel();
   return {
-    ...visualModel,
+    ...model,
     lighting: visualLighting,
-    model: visualModel,
-    sdkPlan: buildSdkImagePlan(visualModel),
+    model,
+    sdkPlan: buildSdkImagePlan(model),
   };
 }
 
@@ -1500,6 +1527,8 @@ bridge = new MicroBridge({
     bridge.drain();
   },
 });
+
+refreshVisualModel();
 
 function bridgeResult(events, extra = {}) {
   return {
@@ -1681,11 +1710,14 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && route === '/api/visual/state') {
-      const requestedPhase = Number(requestUrl.searchParams.get('phase'));
-      const phase = Number.isFinite(requestedPhase) ? Math.max(0, Math.min(1, requestedPhase)) : visualModel.phase;
-      const model = phase === visualModel.phase
-        ? visualModel
-        : createN4RenderModel({config, lighting: visualLighting, phase,localActions:nativeBridge.n4.localActions});
+      const phaseText = requestUrl.searchParams.get('phase');
+      const requestedPhase = phaseText === null ? NaN : Number(phaseText);
+      const phase = Number.isFinite(requestedPhase)
+        ? Math.max(0, Math.min(1, requestedPhase))
+        : visualModel.phase;
+      const model = Number.isFinite(requestedPhase)
+        ? modelCache().get(phase)
+        : currentVisualModel();
       return json(res, 200, {
         lighting: visualLighting,
         model:{...model,screenTest:screenTestSnapshot()},
@@ -1693,7 +1725,7 @@ const server = http.createServer(async (req, res) => {
       });
     }
     if (req.method === 'GET' && route === '/api/visual/preview') {
-      const html = renderPreviewHtml(visualModel);
+      const html = renderPreviewHtml(currentVisualModel());
       res.writeHead(200, {
         'content-type': 'text/html; charset=utf-8',
         'cache-control': 'no-store',
@@ -1943,6 +1975,6 @@ module.exports = {
   bridge,
   transport,
   getConfig: () => config,
-  getVisualState: () => ({lighting: visualLighting, model: visualModel}),
+  getVisualState: () => ({lighting: visualLighting, model: currentVisualModel()}),
   nativeStatusSnapshot,
 };

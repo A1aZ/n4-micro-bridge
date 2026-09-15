@@ -49,6 +49,13 @@
     <details><summary>只测试按键？使用浏览器连接</summary><p class="guide-help">此模式只接收输入，不控制屏幕。选择设备时，名称可能显示为 HOTSPOTEKUSB HID DEMO。两种连接方式不能同时使用。</p><div id="guide-browser-host"></div></details>
   </section>
   <section id="guide-input" class="guide-card">
+    <div id="reasoning-setup" class="warning" hidden>
+      <h3>第三旋钮已分配为推理强度 · 首次设置</h3>
+      <p>在 Codex 的设置 → Codex Micro 中，将摇杆左方向设为“降低推理强度”，右方向设为“增加推理强度”。不是修改主旋钮模式。</p>
+      <p>完成后点击下方确认，本机配置会记住。未确认前第三旋钮不会发送方向指令，避免触发默认的历史前进／后退。</p>
+      <button id="reasoning-confirm" type="button">我已完成设置，启用第三旋钮</button>
+      <p id="reasoning-setup-status" role="status"></p>
+    </div>
     <h2><span class="step-number">02</span>按一按，转一转</h2>
     <p class="guide-help">在实体 N4 上，从左到右转动四个旋钮，再分别按一下。下面会显示收到的操作。</p>
     <p id="guide-input-status" class="status" role="status">尚未收到操作。连接后，先把最左边的旋钮顺时针转一格。</p>
@@ -353,6 +360,7 @@
         };
       }
       function applyDebugMappings(value) {
+        renderReasoningSetup(value);
         const mapped = buildDebugMappings(value);
         activeKnobs = mapped.knobs;
         activeButtons = mapped.buttons;
@@ -502,7 +510,26 @@
         } catch (error) { button.textContent = '预览加载失败，点击重试'; print({error:'预览加载失败',message:error.message}); }
         finally { button.disabled = false; }
       }
+      function renderReasoningSetup(config) {
+        const knob=config?.knobs?.find(item=>item.id==='knob-3');
+        $('reasoning-setup').hidden=!(knob&&knob.enabled!==false&&knob.mode==='reasoning'&&knob.reasoningConfigured!==true);
+      }
+      async function confirmReasoningSetup() {
+        const button=$('reasoning-confirm');button.disabled=true;
+        $('reasoning-setup-status').textContent='正在保存…';
+        try {
+          const config=await jsonFetch('/api/config');
+          const knob=config.knobs?.find(item=>item.id==='knob-3');
+          if(!knob||knob.mode!=='reasoning')throw new Error('第三旋钮用途已更改，请刷新配置后再试');
+          knob.reasoningConfigured=true;
+          const saved=await jsonFetch('/api/config',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(config)});
+          renderReasoningSetup(saved.config);
+          $('reasoning-setup-status').textContent='已保存；以后无需重复确认。';
+        } catch(error) {$('reasoning-setup-status').textContent='未能保存：'+error.message;}
+        finally {button.disabled=false;}
+      }
       function setupGuide() {
+        $('reasoning-confirm').onclick=confirmReasoningSetup;
         const browserRow = $('connect').parentElement;
         $('guide-browser-host').append($('status'), browserRow);
         const extra = document.createElement('details'), summary = document.createElement('summary');

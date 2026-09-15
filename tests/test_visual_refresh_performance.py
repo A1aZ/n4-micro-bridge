@@ -44,18 +44,18 @@ class RefreshTests(unittest.TestCase):
             self.assertTrue(all(b-a>=.025 for a,b in zip(times,times[1:])),times)
         finally:out.stop()
 
-    def test_file_fallback_redraws_batch_on_animation_and_state_changes(self):
+    def test_file_fallback_uploads_only_changed_regions_on_animation_and_state_changes(self):
         out=N4VisualOutput(Fake())
         try:
             out.apply_snapshot({'lighting':{'agents':[{'c':0x33ccbb,'b':1,'e':4,'s':.4}]},'model':{'theme':'pixel','stripMode':'knobs'}})
             self.assertTrue(out.render_once(force=True)['ok'])
             out._phase=.2
-            self.assertEqual(len(out.render_once()['uploads']),14)
+            self.assertEqual([x['logicalKey'] for x in out.render_once()['uploads']],[1])
             out.handle('v.oai.thstatus',[{'id':0,'c':0x8844cc}])
             frame=out.render_once()
             self.assertTrue(frame['ok'])
             self.assertEqual(frame['performance']['renderedKeys'],14)
-            self.assertEqual([x['logicalKey'] for x in frame['uploads']],list(range(1,15)))
+            self.assertEqual([x['logicalKey'] for x in frame['uploads']],[1])
             self.assertEqual(out.render_once()['uploads'],[])
         finally:out.stop()
 

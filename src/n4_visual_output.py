@@ -20,10 +20,11 @@ import math
 import tempfile
 import threading
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional, Sequence
 
-from n4_visual_renderer import N4VisualRenderer
+from n4_visual_renderer import N4VisualRenderer, normalize_clock
 
 
 SCREEN_SIZE = (800, 480)
@@ -134,7 +135,8 @@ class N4VisualOutput:
     def __init__(self, adapter: Any, *, targets: Optional[Sequence[Optional[str]]] = None,
                  refresh_ms: int = 250, target: str = "both",
                  status_stream: Any = None,
-                 on_update: Optional[Callable[[Mapping[str, Any]], None]] = None) -> None:
+                 on_update: Optional[Callable[[Mapping[str, Any]], None]] = None,
+                 now: Optional[Callable[[], datetime]] = None) -> None:
         if target not in {"both", "screen", "keys"}:
             raise ValueError("visual target must be both, screen, or keys")
         if refresh_ms < 20:
@@ -156,6 +158,7 @@ class N4VisualOutput:
         self.target = target
         self.status_stream = status_stream
         self.on_update = on_update
+        self._now = now or datetime.now
         self.state = _new_state()
         self._tmpdir = tempfile.TemporaryDirectory(prefix="mirabox-codex-n4-")
         self._hashes: dict[str, str] = {}
@@ -164,6 +167,7 @@ class N4VisualOutput:
         self._startup_repaint_at = None
         self._ready_since = None
         self._batch_signature = None
+        self._last_clock_minute: Optional[str] = None
         self.screen_test = {'mode':'off'}
         from n4_frame_cache import NativeFrameCache
         self._frame_cache=NativeFrameCache()
@@ -180,6 +184,14 @@ class N4VisualOutput:
     def _status(self, message: str) -> None:
         if self.status_stream is not None:
             print(message, file=self.status_stream, flush=True)
+
+    def _clock_payload(self) -> dict[str, str]:
+        """Return the local clock used by the first information-strip zone."""
+
+        return normalize_clock(self._now())
+
+    def _clock_enabled(self) -> bool:
+        return self.strip_options.get("stripMode") == "knobs"
 
     @staticmethod
     def _make_renderer(targets: Sequence[Optional[str]], theme: str = 'debug', options=None) -> N4VisualRenderer:
@@ -285,6 +297,7 @@ class N4VisualOutput:
                 self.theme = next_theme
                 self.strip_options = next_options
                 self._renderer = self._make_renderer(self.targets, self.theme, self.strip_options)
+                self._last_clock_minute = None
             self._dirty = True
             self._generation = getattr(self, "_generation", 0) + 1
             self._wake.set()
@@ -358,7 +371,8 @@ class N4VisualOutput:
             with self._lock:
                 startup_due=self._startup_repaint_at is not None and time.monotonic()>=self._startup_repaint_at
                 animated=self.screen_test.get('mode','off')=='off' and any(float(light.get('b',0))>0 and float(light.get('s',0))>0 and int(light.get('e',0)) in (2,3,4,5,6) for light in self.state['agents'])
-                dirty = self._dirty or startup_due or animated
+                clock_due = self._clock_enabled() and self._clock_payload()["minute"] != self._last_clock_minute
+                dirty = self._dirty or startup_due or animated or clock_due
             if dirty:
                 self._phase=(0.5+(time.monotonic()-animation_start)/5.0)%1.0
                 self.render_once()
@@ -366,7 +380,7 @@ class N4VisualOutput:
             # displaying the JPEG. Keep a quiet interval after each batch.
             next_frame=time.monotonic()+interval
 
-    def _key_signature(self,index,phase):
+    def _key_signature(self,index,phase,clock_minute=None):
         light=self._key_light(self.targets[index])
         is_info=index>=10 and self.strip_options.get('stripMode')=='knobs'
         animated=not is_info and int(light.get('e',0)) in {2,3,4,5,6} and float(light.get('b',0))>0
@@ -374,7 +388,8 @@ class N4VisualOutput:
         if self.theme!='debug' and str(self.targets[index]).startswith('AG'):
             animated=animated and float(light.get('s',0))>0
         return json.dumps([self.theme,self.targets[index],self.strip_options,
-                           None if is_info else light,phase if animated else None],sort_keys=True)
+                           None if is_info else light,phase if animated else None,
+                           clock_minute if index == 10 and is_info else None],sort_keys=True)
 
     def _key_light(self, target: Optional[str]) -> Mapping[str, Any]:
         if not target:
@@ -387,7 +402,7 @@ class N4VisualOutput:
             return self.state["keys"]
         return DEFAULT_LIGHT
 
-    def _render_key(self, index: int, target: Optional[str], phase: float) -> Any:
+    def _render_key(self, index: int, target: Optional[str], phase: float, clock: Any = None) -> Any:
         # Keep this compatibility method because older tests/callers use the
         # zero-based index + explicit target signature.  The actual drawing
         # lives in N4VisualRenderer so sideband output and offline previews
@@ -397,10 +412,11 @@ class N4VisualOutput:
             self.state,
             phase=phase,
             target_override=False if target is None else target,
+            clock=clock,
         )
 
-    def _render_screen(self, phase: float) -> Any:
-        return self._renderer.render(self.state, phase=phase).screen
+    def _render_screen(self, phase: float, clock: Any = None) -> Any:
+        return self._renderer.render(self.state, phase=phase, clock=clock).screen
 
     @staticmethod
     def _save(image: Any, path: Path) -> str:
@@ -441,15 +457,17 @@ class N4VisualOutput:
                 # presentation. Retry every key once after startup settles,
                 # including static keys; do NOT resend the black background.
                 diagnostic=self.screen_test.get('mode','off')
+                clock = self._clock_payload() if self._clock_enabled() and diagnostic == 'off' else None
+                clock_minute = clock.get('minute') if clock else None
                 animated=any(float(light.get('b',0))>0 and float(light.get('s',0))>0 and int(light.get('e',0)) in (2,3,4,5,6) for light in self.state['agents'])
-                signature=json.dumps(self.screen_test if diagnostic!='off' else [self.state,self.theme,self.targets,self.strip_options,phase if animated else None],sort_keys=True)
+                signature=json.dumps(self.screen_test if diagnostic!='off' else [self.state,self.theme,self.targets,self.strip_options,phase if animated else None,clock_minute],sort_keys=True)
                 repaint_keys=force or startup_repaint or signature!=self._batch_signature or any(f'key:{i}' not in self._hashes for i in range(1,15))
                 native_frames=diagnostic=='off' and callable(getattr(self.adapter,'supports_native_frames',None)) and self.adapter.supports_native_frames()
                 # Render a single immutable snapshot so screen and key files
                 # share exactly the same lighting phase.  The renderer owns
                 # all Pillow drawing; this class remains an upload/cache
                 # worker only.
-                bundle = self._renderer.render(self.state, phase=phase) if self.target=='screen' or (repaint_keys and not native_frames) else None
+                bundle = self._renderer.render(self.state, phase=phase, clock=clock) if self.target=='screen' or (repaint_keys and not native_frames) else None
                 uploads: list[dict[str, Any]] = []
                 pending_hashes: dict[str, str] = {}
                 pending_inputs = {}
@@ -479,9 +497,9 @@ class N4VisualOutput:
                     for index in range(14):
                         cache_key = f"key:{index + 1}"
                         if native_frames:
-                            frame_signature=self._key_signature(index,phase)
+                            frame_signature=self._key_signature(index,phase,clock_minute)
                             misses=self._frame_cache.misses
-                            data=self._frame_cache.get((index,frame_signature),lambda:self._renderer.render_key(index+1,self.state,phase=phase))
+                            data=self._frame_cache.get((index,frame_signature),lambda:self._renderer.render_key(index+1,self.state,phase=phase,clock=clock))
                             rendered+=self._frame_cache.misses-misses
                             digest=hashlib.sha256(data).hexdigest()
                             if not force and not startup_repaint and self._hashes.get(cache_key)==digest:continue
@@ -500,6 +518,13 @@ class N4VisualOutput:
                         rendered+=1
                         path = tempdir / f"key-{index + 1}.png"
                         digest = self._save(image, path)
+                        # The file-based SDK path has the same deduplication
+                        # guarantee as native frame uploads.  In particular,
+                        # a minute tick changes only information key 11; do
+                        # not reopen/upload the other thirteen regions and
+                        # create an avoidable visible refresh window.
+                        if not force and not startup_repaint and self._hashes.get(cache_key) == digest:
+                            continue
                         result = self.adapter.set_key_image(index + 1, str(path))
                         self._check_upload_result(result, f"set_key_image({index + 1})")
                         pending_hashes[cache_key] = digest
@@ -514,6 +539,7 @@ class N4VisualOutput:
                 self._hashes.update(pending_hashes)
                 self._render_inputs.update(pending_inputs)
                 self._batch_signature=signature
+                self._last_clock_minute = clock_minute if self._clock_enabled() else None
                 if startup_repaint:self._startup_repaint_at=None
                 if 'screen' in pending_hashes and self.target=='both':
                     self._startup_repaint_at=time.monotonic()+2.0

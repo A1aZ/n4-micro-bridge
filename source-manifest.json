@@ -15,8 +15,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 1508,
-      "sha256": "a47ede0db453e77a6e950141db08fb8cf4cf8c97e9e6753ee2719261a58b7987"
+      "bytes": 1854,
+      "sha256": "0004d7993cae0d5399709d8927a9c4718b2222711787ca672d9026248d84588c"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -855,8 +855,8 @@
     },
     {
       "path": "src/micro-config.cjs",
-      "bytes": 14727,
-      "sha256": "68111ff74ae73ab3aa6d1aabb7901e3a093c09af7ced65d47f6bb9e0a4659176"
+      "bytes": 15781,
+      "sha256": "90241f51f8c398897abe7bfe0455da1805f65a6502d7df3ad761fcf258f8a00f"
     },
     {
       "path": "src/micro-files.cjs",
@@ -900,13 +900,13 @@
     },
     {
       "path": "src/n4-theme-svg.cjs",
-      "bytes": 6739,
-      "sha256": "2587d8f0fd50481cf29e4096a5b8c7eda3efa7a1673abdaa3940b760f52e2c8f"
+      "bytes": 8200,
+      "sha256": "68518580bbab71afbee58a8427581e087be59ce3f5546dc4e9c770423b81dd3b"
     },
     {
       "path": "src/n4-visuals.cjs",
-      "bytes": 27725,
-      "sha256": "b929b87cd6d913d253ee0a12e6ea597e7d8af248f12c393754c87abe66290c0b"
+      "bytes": 28892,
+      "sha256": "624722945e0924a12374400c8caca194dc7aca4d5e2f1b4d31c2838896f10e42"
     },
     {
       "path": "src/n4_frame_cache.py",
@@ -930,18 +930,18 @@
     },
     {
       "path": "src/n4_themes.py",
-      "bytes": 6295,
-      "sha256": "f77ec9966d276a42512a23f06dc9b5e21b63c4f44e18fb5b761f367851713936"
+      "bytes": 7641,
+      "sha256": "40476c3e18c71ce3a0f23850fc198a4a3986480ba1d282258618b1da99eceab8"
     },
     {
       "path": "src/n4_visual_output.py",
-      "bytes": 27365,
-      "sha256": "6e546fa812835d1794c02c4a21aeccf8e35fed65cd1699b30b1b538cda08929b"
+      "bytes": 29020,
+      "sha256": "8161cb7214ea3add7e5e32c8efd8f2c661a2c527715f4eadf21eaa0233ace202"
     },
     {
       "path": "src/n4_visual_renderer.py",
-      "bytes": 36374,
-      "sha256": "9f0824780856bb1aa9e010e56badb2cdfd083c092ca72734f5bf9b19bf2c4df7"
+      "bytes": 37928,
+      "sha256": "ffb63368303d0d0c10e818908d6edba0dd8899a942436e74fe66e74d44291d43"
     },
     {
       "path": "src/n4_webui_bridge.py",
@@ -957,6 +957,11 @@
       "path": "src/native-process-info.cjs",
       "bytes": 635,
       "sha256": "6a1d75c3f7266bf2f522a3e744d71b9a4cb153ebc4a3aa8c2c66ef5f00bd6b37"
+    },
+    {
+      "path": "src/visual-model-cache.cjs",
+      "bytes": 2848,
+      "sha256": "e49b9649a72b5dff0e3404c3193730a0bcf0d94f747e6f6602a2036a13ff989b"
     },
     {
       "path": "tests/agent-feedback.test.cjs",
@@ -1000,8 +1005,8 @@
     },
     {
       "path": "tests/info-strip.test.cjs",
-      "bytes": 1049,
-      "sha256": "8c72a596926eda59e56ac0d5a0535344e05a4985f4a707138d35dc1927aa861a"
+      "bytes": 1517,
+      "sha256": "bce0a42bc1e3db5e87f280c059a377b1398676776f70275db3268428d94b2910"
     },
     {
       "path": "tests/launcher-browser.test.cjs",
@@ -1025,8 +1030,8 @@
     },
     {
       "path": "tests/micro-bridge.test.cjs",
-      "bytes": 4943,
-      "sha256": "388af5305bbec9005bd0e7740d836a36442ec23b5ac17b1d6471a6e204a29dbb"
+      "bytes": 5652,
+      "sha256": "7a8effb71b0116a23126792a1f52ad4fcf167c6b7db4b0c14cb4ac4dc2c283ca"
     },
     {
       "path": "tests/micro-config.test.cjs",
@@ -1069,6 +1074,11 @@
       "sha256": "6a908e61ce93b37b0a776423a399e4b16526790e0bd8cb68d2ef9f25d4645bcc"
     },
     {
+      "path": "tests/reasoning-onboarding.test.cjs",
+      "bytes": 2619,
+      "sha256": "119cccf9673904044d9940e75bc3539eca3760cf0facce7cf507345515ee51cc"
+    },
+    {
       "path": "tests/release-hygiene.test.cjs",
       "bytes": 1040,
       "sha256": "690114ac708f99f5021bb8d0fae32523d14adc0652a48cf15afedc9bd2a96fdc"
@@ -1077,6 +1087,11 @@
       "path": "tests/status-robot.test.cjs",
       "bytes": 542,
       "sha256": "8ab3bc8a50c186c4f30acb99b2d850d54563c9d5f90ec7e03a561ba5431fff6d"
+    },
+    {
+      "path": "tests/strip-fast-key.test.cjs",
+      "bytes": 1100,
+      "sha256": "e34dda0ff355a575809b7a51689ae9d2a321815ac58d56ac3640ff8285a95324"
     },
     {
       "path": "tests/test_agent_feedback.py",
@@ -1125,8 +1140,8 @@
     },
     {
       "path": "tests/test_n4_info_strip.py",
-      "bytes": 937,
-      "sha256": "ddc791bcdf0d46711b7d372b1f8029ff4f0d8abc3494ed6f9f5517688cfc1af7"
+      "bytes": 1496,
+      "sha256": "351a2e68dd4cada26e6b8146294e4427831db5852425006fc06c56dcb85f5c0f"
     },
     {
       "path": "tests/test_n4_local_actions.py",
@@ -1145,8 +1160,8 @@
     },
     {
       "path": "tests/test_n4_visual_output.py",
-      "bytes": 9629,
-      "sha256": "b0a77fbf84b3a89bfc4ac4ae112e1012612a8e81b6bdfeffbd585dbff044b5bc"
+      "bytes": 10875,
+      "sha256": "8bd87cec0d5ab3973c382c604cdde3667c3a4d9d5d1381d5dbcb0b60544a7d37"
     },
     {
       "path": "tests/test_n4_visual_renderer.py",
@@ -1184,14 +1199,19 @@
       "sha256": "61713dc9d71e32e8e7d4d32a90701fe435bcb676e2f16bf3537ebe1dd07e0b6b"
     },
     {
+      "path": "tests/test_strip_fast_icon.py",
+      "bytes": 821,
+      "sha256": "cc35645ab9172a82e882749e6053b1c96cb0176cc54b841968c939949a0af233"
+    },
+    {
       "path": "tests/test_unsigned_display_error.py",
       "bytes": 773,
       "sha256": "8ef18ff34526758d5978f0696ca8c4ae9843fae0adf52358180f5f4c8dc574ee"
     },
     {
       "path": "tests/test_visual_refresh_performance.py",
-      "bytes": 4248,
-      "sha256": "f8f312b8bf8ef91bcb1192cffbf1e60afa3c25009262f536fbae82fa7f43aaa6"
+      "bytes": 4272,
+      "sha256": "a129fc993dc25228cf721079ecaa2f8ecdc8651f39b83ce713f1ed392b0dbf6e"
     },
     {
       "path": "tests/theme-config.test.cjs",
@@ -1202,6 +1222,11 @@
       "path": "tests/transport-webui.test.cjs",
       "bytes": 7847,
       "sha256": "9c436021e081271f19f004e9005d9cc47ae4283976c678ba7a2d0141767f58a6"
+    },
+    {
+      "path": "tests/visual-model-cache.test.cjs",
+      "bytes": 2986,
+      "sha256": "879d4fe79b93d4b91d08658837070c2a042b1b8d1bbd3d828902e746b83625e3"
     },
     {
       "path": "tests/webui-smoke.test.cjs",
@@ -1360,8 +1385,8 @@
     },
     {
       "path": "webui/button-test.html",
-      "bytes": 9616,
-      "sha256": "c82cf1f5a38d8d28b4d2821c8118a8098cb8a8b5756274fc6fd2d86b5ced9df8"
+      "bytes": 9694,
+      "sha256": "428c6cb05d38f014c7c97bbc93ece1b9640549f40d9ecc705ad0a938db1e404d"
     },
     {
       "path": "webui/config.html",
@@ -1375,8 +1400,8 @@
     },
     {
       "path": "webui/real-n4.html",
-      "bytes": 86054,
-      "sha256": "2be5747a6f299309e35b71aac59a21de17ed30cc5883ffedbe74db1e1c9e3160"
+      "bytes": 87933,
+      "sha256": "00f381829434284e93ee1ec6481a8fff7f33f2b6ffc34b7c97979544acada55e"
     },
     {
       "path": "webui/screen-test.html",
@@ -1385,8 +1410,8 @@
     },
     {
       "path": "webui/server.cjs",
-      "bytes": 77644,
-      "sha256": "dc6cda7730ebed05b548cc063e5c59b2f1ca5f023cf308adfd7d65e09fa4776c"
+      "bytes": 78375,
+      "sha256": "d7b79769fd5f0a2f2d8fe611d41ec5d3b331118872789e9e1585e3b5bc5830b9"
     },
     {
       "path": "webui/visual.html",

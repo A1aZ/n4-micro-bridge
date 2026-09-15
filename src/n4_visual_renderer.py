@@ -32,6 +32,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from functools import lru_cache
 from io import BytesIO
+from datetime import datetime
 import math
 import os
 from pathlib import Path
@@ -83,6 +84,7 @@ FOREGROUND = (232, 238, 247)
 MUTED = (139, 154, 176)
 BORDER = (49, 65, 87)
 DISABLED = (41, 51, 67)
+CLOCK_WEEKDAYS = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
 
 
 def _require_pillow() -> None:
@@ -110,6 +112,29 @@ def _number(value: Any, default: float = 0.0) -> float:
     except (TypeError, ValueError):
         return default
     return number if math.isfinite(number) else default
+
+
+def normalize_clock(value: Any = None) -> dict[str, str]:
+    """Return a compact local clock payload for the left information strip."""
+
+    if isinstance(value, Mapping) and isinstance(value.get("time"), str) and isinstance(value.get("date"), str):
+        date_text = value["date"]
+        time_text = value["time"]
+        return {
+            "time": time_text,
+            "date": date_text,
+            "weekday": str(value.get("weekday") or ""),
+            "minute": str(value.get("minute") or f"{date_text} {time_text}"),
+        }
+    current = value if isinstance(value, datetime) else datetime.now()
+    date_text = current.strftime("%Y-%m-%d")
+    time_text = current.strftime("%H:%M")
+    return {
+        "time": time_text,
+        "date": date_text,
+        "weekday": CLOCK_WEEKDAYS[current.weekday()],
+        "minute": f"{date_text} {time_text}",
+    }
 
 
 def normalize_color(value: Any, default: int = 0) -> int:
@@ -767,10 +792,11 @@ class N4VisualRenderer:
         self.jpeg_quality = quality
         self.title = str(title)
 
-    def render(self, source: Any = None, *, phase: float = 0.5) -> N4RenderBundle:
+    def render(self, source: Any = None, *, phase: float = 0.5, clock: Any = None) -> N4RenderBundle:
         """Render one endpoint/mapping snapshot into a bundle of PIL images."""
 
         phase_value = _clamp(_number(phase, 0.5), 0.0, 1.0)
+        clock_value = normalize_clock(clock)
         lighting = normalize_lighting(source, phase=phase_value, strict=self.strict)
         key_lights = []
         key_sources = []
@@ -783,7 +809,7 @@ class N4VisualRenderer:
                 from n4_themes import render_info_strip
                 index=binding.index-11
                 knob=self.knobs[index] if index<len(self.knobs) else {}
-                key_images.append(render_info_strip(index,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size)))
+                key_images.append(render_info_strip(index,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),fast_touch=index==3 and binding.enabled and binding.target_key=='ACT06',clock=clock_value if index==0 else None))
             else:
                 key_images.append(_render_key_image(binding, light, source_name, font_path=self.font_path, theme=self.theme,phase=phase_value))
         key_images_tuple = tuple(key_images)
@@ -797,10 +823,10 @@ class N4VisualRenderer:
             key_sources=tuple(key_sources), phase=phase_value,
         )
 
-    def render_screen(self, source: Any = None, *, phase: float = 0.5) -> Any:
+    def render_screen(self, source: Any = None, *, phase: float = 0.5, clock: Any = None) -> Any:
         """Convenience wrapper returning only the 800x480 image."""
 
-        return self.render(source, phase=phase).screen
+        return self.render(source, phase=phase, clock=clock).screen
 
     def render_key(
         self,
@@ -809,6 +835,7 @@ class N4VisualRenderer:
         *,
         phase: float = 0.5,
         target_override: Any = None,
+        clock: Any = None,
     ) -> Any:
         """Convenience wrapper returning one 1-based key image.
 
@@ -825,7 +852,7 @@ class N4VisualRenderer:
         if target_override is None and self.strip_mode=='knobs' and index>10:
             from n4_themes import render_info_strip
             knob=self.knobs[index-11] if index-11<len(self.knobs) else {}
-            return render_info_strip(index-11,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size))
+            return render_info_strip(index-11,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),fast_touch=index==14 and configured.enabled and configured.target_key=='ACT06',clock=normalize_clock(clock) if index==11 else None)
         lighting = normalize_lighting(source, phase=phase_value, strict=self.strict)
         target = None if target_override is False else str(target_override)
         binding = configured if target_override is None else KeyBinding(
@@ -837,10 +864,10 @@ class N4VisualRenderer:
         light, source_name = _target_light(binding, lighting)
         return _render_key_image(binding, light, source_name, font_path=self.font_path, theme=self.theme,phase=phase_value)
 
-    def render_jpegs(self, source: Any = None, *, phase: float = 0.5) -> N4JpegBundle:
+    def render_jpegs(self, source: Any = None, *, phase: float = 0.5, clock: Any = None) -> N4JpegBundle:
         """Render and encode one snapshot without touching disk."""
 
-        return self.render(source, phase=phase).to_jpegs(self.jpeg_quality)
+        return self.render(source, phase=phase, clock=clock).to_jpegs(self.jpeg_quality)
 
 
 def render_n4_bundle(
@@ -848,12 +875,13 @@ def render_n4_bundle(
     config: Any = None,
     *,
     phase: float = 0.5,
+    clock: Any = None,
     font_path: Optional[os.PathLike[str] | str] = None,
     strict: bool = False,
 ) -> N4RenderBundle:
     """Pure convenience function equivalent to ``N4VisualRenderer(...).render``."""
 
-    return N4VisualRenderer(config, font_path=font_path, strict=strict).render(source, phase=phase)
+    return N4VisualRenderer(config, font_path=font_path, strict=strict).render(source, phase=phase, clock=clock)
 
 
 def render_screen_image(
@@ -861,12 +889,13 @@ def render_screen_image(
     config: Any = None,
     *,
     phase: float = 0.5,
+    clock: Any = None,
     font_path: Optional[os.PathLike[str] | str] = None,
     strict: bool = False,
 ) -> Any:
     """Render only the 800x480 N4 screen image."""
 
-    return render_n4_bundle(source, config, phase=phase, font_path=font_path, strict=strict).screen
+    return render_n4_bundle(source, config, phase=phase, clock=clock, font_path=font_path, strict=strict).screen
 
 
 def render_key_image(
@@ -875,12 +904,13 @@ def render_key_image(
     config: Any = None,
     *,
     phase: float = 0.5,
+    clock: Any = None,
     font_path: Optional[os.PathLike[str] | str] = None,
     strict: bool = False,
 ) -> Any:
     """Render one 1-based N4 key image."""
 
-    return N4VisualRenderer(config, font_path=font_path, strict=strict).render_key(index, source, phase=phase)
+    return N4VisualRenderer(config, font_path=font_path, strict=strict).render_key(index, source, phase=phase, clock=clock)
 
 
 def render(
@@ -888,12 +918,13 @@ def render(
     config: Any = None,
     *,
     phase: float = 0.5,
+    clock: Any = None,
     font_path: Optional[os.PathLike[str] | str] = None,
     strict: bool = False,
 ) -> N4RenderBundle:
     """Short alias for :func:`render_n4_bundle` used by live adapters."""
 
-    return render_n4_bundle(source, config, phase=phase, font_path=font_path, strict=strict)
+    return render_n4_bundle(source, config, phase=phase, clock=clock, font_path=font_path, strict=strict)
 
 
 def _jpeg_bytes(image: Any, quality: int = DEFAULT_JPEG_QUALITY) -> bytes:
@@ -909,7 +940,7 @@ def _jpeg_bytes(image: Any, quality: int = DEFAULT_JPEG_QUALITY) -> bytes:
 __all__ = [
     "SCREEN_SIZE", "MAIN_KEY_SIZE", "SECONDARY_KEY_SIZE", "KEY_COUNT",
     "MAIN_KEY_COUNT", "SECONDARY_KEY_COUNT", "DEFAULT_JPEG_QUALITY",
-    "EFFECT_NAMES", "normalize_color", "color_rgb", "color_hex",
+    "EFFECT_NAMES", "normalize_color", "color_rgb", "color_hex", "normalize_clock",
     "normalize_effect", "effect_name", "animation_intensity",
     "LightState", "LightingState", "KeyBinding", "N4JpegBundle",
     "N4PathBundle", "N4RenderBundle", "normalize_light",

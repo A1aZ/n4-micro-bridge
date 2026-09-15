@@ -96,7 +96,7 @@ def render_key(binding,light,theme,font,phase=0.5):
         if enabled and level>0:draw.line((12,5,width-13,5),fill=accent,width=3)
     return image
 
-def render_info_strip(index,knob,brightness,font):
+def render_info_strip(index,knob,brightness,font,fast_touch=False,clock=None):
     mode=knob.get('mode','micro')
     if mode not in CATALOG['knobIcons']:raise ValueError('Invalid information-strip mode')
     title={'micro':'导航','scroll':'聊天滚动','reasoning':'推理强度','brightness':'亮度'}[mode]
@@ -104,9 +104,26 @@ def render_info_strip(index,knob,brightness,font):
     if not knob.get('enabled',True):detail='已停用'
     image=Image.new('RGB',(176,112),BG);draw=ImageDraw.Draw(image)
     draw.rounded_rectangle((1,1,174,110),radius=8,outline=(46,59,76))
+    if index == 0 and isinstance(clock, dict) and clock.get('time') and clock.get('date'):
+        # The left-most strip is the one glance-away status area.  Keep the
+        # first knob's role as a small hint while giving the clock enough
+        # contrast and pixels to remain legible on the physical 176x112 lens.
+        draw.text((12,15),'当前时间',font=font(11),fill=MUTED,anchor='lm')
+        date_text=str(clock['date']) + (f" · {clock['weekday']}" if clock.get('weekday') else '')
+        draw.text((164,15),date_text,font=font(10),fill=MUTED,anchor='ra')
+        draw.text((12,61),str(clock['time']),font=font(35),fill=FG,anchor='lm')
+        symbol=asset(CATALOG['knobIcons'][mode]).resize((18,18),Image.Resampling.LANCZOS)
+        image.paste(symbol,(12,80),symbol)
+        hint='旋钮 1 · 已停用' if not knob.get('enabled',True) else f'旋钮 1 · {title}'
+        draw.text((38,94),hint,font=font(11),fill=MUTED,anchor='lm')
+        return image
     draw.text((12,15),f'旋钮 {index+1}',font=font(11),fill=MUTED,anchor='lm')
     symbol=asset(CATALOG['knobIcons'][mode]).resize((25,25),Image.Resampling.LANCZOS)
     image.paste(symbol,(12,39),symbol)
     draw.text((47,52),title,font=font(17),fill=FG,anchor='lm')
-    draw.text((88,89),detail,font=font(12),fill=MUTED,anchor='mm')
+    if fast_touch:
+        draw.text((12,86),f'{brightness}%' if brightness is not None else '旋转调亮度',font=font(12),fill=MUTED,anchor='lm')
+        draw.rounded_rectangle((125,67,167,104),radius=6,fill=(52,43,24),outline=(237,187,70))
+        draw.polygon([(147,71),(136,88),(145,88),(140,100),(158,81),(149,81)],fill=(255,210,90))
+    else:draw.text((88,89),detail,font=font(12),fill=MUTED,anchor='mm')
     return image

@@ -108,6 +108,32 @@ function finiteNumber(value, label) {
   return number;
 }
 
+const CLOCK_WEEKDAYS = Object.freeze(['周日', '周一', '周二', '周三', '周四', '周五', '周六']);
+
+function normalizeClock(value = undefined) {
+  if (isObject(value)
+      && typeof value.time === 'string'
+      && typeof value.date === 'string') {
+    return {
+      time: value.time,
+      date: value.date,
+      weekday: typeof value.weekday === 'string' ? value.weekday : '',
+      minute: typeof value.minute === 'string' ? value.minute : `${value.date} ${value.time}`,
+    };
+  }
+  const date = value instanceof Date ? value : new Date(value === undefined ? Date.now() : value);
+  const safe = Number.isNaN(date.getTime()) ? new Date() : date;
+  const pad = number => String(number).padStart(2, '0');
+  const day = `${safe.getFullYear()}-${pad(safe.getMonth() + 1)}-${pad(safe.getDate())}`;
+  const time = `${pad(safe.getHours())}:${pad(safe.getMinutes())}`;
+  return {
+    time,
+    date: day,
+    weekday: CLOCK_WEEKDAYS[safe.getDay()],
+    minute: `${day} ${time}`,
+  };
+}
+
 function normalizeUnit(value, label) {
   if (typeof value === 'boolean') return value ? 1 : 0;
   return clamp(finiteNumber(value, label), 0, 1);
@@ -459,12 +485,13 @@ function createN4RenderModel(options = {}) {
   const config = normalizeConfig(options.config || defaultConfig());
   const lighting = createLightingState(options.lighting || options.state);
   const phase = options.phase === undefined ? 0.5 : clamp(finiteNumber(options.phase, 'phase'), 0, 1);
+  const clock = normalizeClock(options.clock);
   const buttons = config.buttons.map((binding, index) => {
     const position = buttonPosition(index);
     const source = sourceLightForTarget(binding.targetKey, lighting);
     const light = describeLight(binding.enabled ? source.light : LIGHT_DEFAULT, phase);
     const button = {
-      knobInfo:index>=10&&config.visual.stripMode==='knobs'?{index:index-10,...config.knobs[index-10],brightness:options.localActions?.brightnessApplied===true?options.localActions.brightness:null}:null,
+      knobInfo:index>=10&&config.visual.stripMode==='knobs'?{index:index-10,...config.knobs[index-10],fastTouch:index===13&&binding.enabled&&binding.targetKey==='ACT06',brightness:options.localActions?.brightnessApplied===true?options.localActions.brightness:null,clock:index===10?clock:null}:null,
       theme: config.visual.theme,
       index: index + 1,
       id: binding.id,
@@ -497,6 +524,7 @@ function createN4RenderModel(options = {}) {
     schema: N4_RENDER.schema,
     version: N4_RENDER.version,
     phase,
+    clock,
     sdk: {
       screen: {...N4_RENDER.screen, method: 'set_touchscreen_image'},
       key: {...N4_RENDER.mainKey, method: 'set_key_image'},
@@ -630,6 +658,7 @@ module.exports = {
   N4_IMAGE_HARDWARE_CODES,
   normalizeColor,
   normalizeEffect,
+  normalizeClock,
   effectName,
   colorHex,
   mergeLight,
