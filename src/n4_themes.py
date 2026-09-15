@@ -99,8 +99,8 @@ def render_key(binding,light,theme,font,phase=0.5):
 def render_info_strip(index,knob,brightness,font,fast_touch=False,clock=None):
     mode=knob.get('mode','micro')
     if mode not in CATALOG['knobIcons']:raise ValueError('Invalid information-strip mode')
-    title={'micro':'导航','scroll':'聊天滚动','reasoning':'推理强度','brightness':'亮度'}[mode]
-    detail={'micro':'跟随 Codex 模式','scroll':'鼠标放聊天区','reasoning':'− / +' if knob.get('reasoningConfigured') else '待绑定左右方向','brightness':f'{brightness}%' if brightness is not None else '旋转调节 · 每格5%'}[mode]
+    title={'micro':'','scroll':'聊天滚动','reasoning':'推理强度','brightness':'亮度'}[mode]
+    detail={'micro':'功能由 Codex 决定','scroll':'鼠标放聊天区','reasoning':'− / +' if knob.get('reasoningConfigured') else '待绑定左右方向','brightness':f'{brightness}%' if brightness is not None else '旋转调节 · 每格5%'}[mode]
     if not knob.get('enabled',True):detail='已停用'
     image=Image.new('RGB',(176,112),BG);draw=ImageDraw.Draw(image)
     draw.rounded_rectangle((1,1,174,110),radius=8,outline=(46,59,76))
@@ -114,13 +114,13 @@ def render_info_strip(index,knob,brightness,font,fast_touch=False,clock=None):
         draw.text((12,61),str(clock['time']),font=font(35),fill=FG,anchor='lm')
         symbol=asset(CATALOG['knobIcons'][mode]).resize((18,18),Image.Resampling.LANCZOS)
         image.paste(symbol,(12,80),symbol)
-        hint='旋钮 1 · 已停用' if not knob.get('enabled',True) else f'旋钮 1 · {title}'
+        hint='旋钮 1 · 已停用' if not knob.get('enabled',True) else f'旋钮 1 · {title}' if title else '旋钮 1'
         draw.text((38,94),hint,font=font(11),fill=MUTED,anchor='lm')
         return image
     draw.text((12,15),f'旋钮 {index+1}',font=font(11),fill=MUTED,anchor='lm')
     symbol=asset(CATALOG['knobIcons'][mode]).resize((25,25),Image.Resampling.LANCZOS)
     image.paste(symbol,(12,39),symbol)
-    draw.text((47,52),title,font=font(17),fill=FG,anchor='lm')
+    if title:draw.text((47,52),title,font=font(17),fill=FG,anchor='lm')
     if fast_touch:
         draw.text((12,86),f'{brightness}%' if brightness is not None else '旋转调亮度',font=font(12),fill=MUTED,anchor='lm')
         draw.line((116,16,116,96),fill=(37,49,64))
