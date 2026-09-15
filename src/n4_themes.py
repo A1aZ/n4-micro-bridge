@@ -123,7 +123,8 @@ def render_info_strip(index,knob,brightness,font,fast_touch=False,clock=None):
     draw.text((47,52),title,font=font(17),fill=FG,anchor='lm')
     if fast_touch:
         draw.text((12,86),f'{brightness}%' if brightness is not None else '旋转调亮度',font=font(12),fill=MUTED,anchor='lm')
-        draw.rounded_rectangle((125,67,167,104),radius=6,fill=(52,43,24),outline=(237,187,70))
-        draw.polygon([(147,71),(136,88),(145,88),(140,100),(158,81),(149,81)],fill=(255,210,90))
+        draw.line((116,16,116,96),fill=(37,49,64))
+        draw.rounded_rectangle((124,34,167,77),radius=7,fill=(52,43,24),outline=(237,187,70))
+        draw.polygon([(148,38),(135,57),(145,57),(140,73),(159,50),(149,50)],fill=(255,210,90))
     else:draw.text((88,89),detail,font=font(12),fill=MUTED,anchor='mm')
     return image
