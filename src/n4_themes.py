@@ -101,10 +101,13 @@ def render_info_strip(index,knob,brightness,font,fast_touch=False,clock=None):
     if mode not in CATALOG['knobIcons']:raise ValueError('Invalid information-strip mode')
     title={'micro':'','scroll':'聊天滚动','reasoning':'推理强度','brightness':'亮度'}[mode]
     detail={'micro':'功能由 Codex 决定','scroll':'鼠标放聊天区','reasoning':'− / +' if knob.get('reasoningConfigured') else '待绑定左右方向','brightness':f'{brightness}%' if brightness is not None else '旋转调节 · 每格5%'}[mode]
+    touch_action=knob.get('touchAction')
+    if touch_action is None and fast_touch:
+        touch_action={'targetKey':'ACT06','eyebrow':'快捷','label':'加速','scope':'strip'}
     if not knob.get('enabled',True):detail='已停用'
     image=Image.new('RGB',(176,112),BG);draw=ImageDraw.Draw(image)
-    draw.rounded_rectangle((1,1,174,110),radius=8,outline=(46,59,76))
     if index == 0 and isinstance(clock, dict) and clock.get('time') and clock.get('date'):
+        draw.rounded_rectangle((1,1,174,110),radius=8,outline=(46,59,76))
         # The left-most strip is the one glance-away status area.  Keep the
         # first knob's role as a small hint while giving the clock enough
         # contrast and pixels to remain legible on the physical 176x112 lens.
@@ -117,14 +120,31 @@ def render_info_strip(index,knob,brightness,font,fast_touch=False,clock=None):
         hint='旋钮 1 · 已停用' if not knob.get('enabled',True) else f'旋钮 1 · {title}' if title else '旋钮 1'
         draw.text((38,94),hint,font=font(11),fill=MUTED,anchor='lm')
         return image
+    if touch_action:
+        # The N4 reports only one hardware code for this whole 176x112 strip,
+        # without touch coordinates.  The two surfaces are therefore visual
+        # hierarchy, not two independently clickable controls.
+        draw.rounded_rectangle((1,1,104,110),radius=8,outline=(46,59,76))
+        draw.text((10,15),f'旋钮 {index+1}',font=font(11),fill=MUTED,anchor='lm')
+        symbol=asset(CATALOG['knobIcons'][mode]).resize((24,24),Image.Resampling.LANCZOS)
+        image.paste(symbol,(10,35),symbol)
+        if title:draw.text((42,50),title,font=font(15),fill=FG,anchor='lm')
+        split_detail='已停用' if not knob.get('enabled',True) else {
+            'micro':'Codex 控制',
+            'scroll':'聊天区',
+            'reasoning':'− / +' if knob.get('reasoningConfigured') else '待绑定',
+            'brightness':f'{brightness}%' if brightness is not None else '每格 5%',
+        }[mode]
+        draw.text((53,89),split_detail,font=font(12),fill=MUTED,anchor='mm')
+        draw.rounded_rectangle((113,1,174,110),radius=8,fill=(35,30,20),outline=(124,98,40))
+        draw.text((144,15),str(touch_action.get('eyebrow','快捷')),font=font(10),fill=(184,163,108),anchor='mm')
+        draw.polygon([(146,29),(128,58),(140,58),(134,83),(161,49),(148,49)],fill=(255,210,90))
+        draw.text((144,94),str(touch_action.get('label','加速')),font=font(12),fill=FG,anchor='mm')
+        return image
+    draw.rounded_rectangle((1,1,174,110),radius=8,outline=(46,59,76))
     draw.text((12,15),f'旋钮 {index+1}',font=font(11),fill=MUTED,anchor='lm')
     symbol=asset(CATALOG['knobIcons'][mode]).resize((25,25),Image.Resampling.LANCZOS)
     image.paste(symbol,(12,39),symbol)
     if title:draw.text((47,52),title,font=font(17),fill=FG,anchor='lm')
-    if fast_touch:
-        draw.text((12,86),f'{brightness}%' if brightness is not None else '旋转调亮度',font=font(12),fill=MUTED,anchor='lm')
-        draw.line((116,16,116,96),fill=(37,49,64))
-        draw.rounded_rectangle((124,34,167,77),radius=7,fill=(52,43,24),outline=(237,187,70))
-        draw.polygon([(148,38),(135,57),(145,57),(140,73),(159,50),(149,50)],fill=(255,210,90))
-    else:draw.text((88,89),detail,font=font(12),fill=MUTED,anchor='mm')
+    draw.text((88,89),detail,font=font(12),fill=MUTED,anchor='mm')
     return image

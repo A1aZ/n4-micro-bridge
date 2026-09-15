@@ -808,8 +808,11 @@ class N4VisualRenderer:
             if self.strip_mode=='knobs' and binding.index>10:
                 from n4_themes import render_info_strip
                 index=binding.index-11
-                knob=self.knobs[index] if index<len(self.knobs) else {}
-                key_images.append(render_info_strip(index,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),fast_touch=index==3 and binding.enabled and binding.target_key=='ACT06',clock=clock_value if index==0 else None))
+                raw_knob=self.knobs[index] if index<len(self.knobs) else {}
+                knob=dict(raw_knob) if isinstance(raw_knob,Mapping) else {}
+                if index==3 and binding.enabled and binding.target_key=='ACT06':
+                    knob['touchAction']={'targetKey':'ACT06','eyebrow':'快捷','label':'加速','icon':'lightning','scope':'strip','layout':'split'}
+                key_images.append(render_info_strip(index,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),clock=clock_value if index==0 else None))
             else:
                 key_images.append(_render_key_image(binding, light, source_name, font_path=self.font_path, theme=self.theme,phase=phase_value))
         key_images_tuple = tuple(key_images)
@@ -851,8 +854,11 @@ class N4VisualRenderer:
         configured = self.bindings[index - 1]
         if target_override is None and self.strip_mode=='knobs' and index>10:
             from n4_themes import render_info_strip
-            knob=self.knobs[index-11] if index-11<len(self.knobs) else {}
-            return render_info_strip(index-11,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),fast_touch=index==14 and configured.enabled and configured.target_key=='ACT06',clock=normalize_clock(clock) if index==11 else None)
+            raw_knob=self.knobs[index-11] if index-11<len(self.knobs) else {}
+            knob=dict(raw_knob) if isinstance(raw_knob,Mapping) else {}
+            if index==14 and configured.enabled and configured.target_key=='ACT06':
+                knob['touchAction']={'targetKey':'ACT06','eyebrow':'快捷','label':'加速','icon':'lightning','scope':'strip','layout':'split'}
+            return render_info_strip(index-11,knob,self.strip_brightness,lambda size:_load_theme_font(self.font_path,size),clock=normalize_clock(clock) if index==11 else None)
         lighting = normalize_lighting(source, phase=phase_value, strict=self.strict)
         target = None if target_override is False else str(target_override)
         binding = configured if target_override is None else KeyBinding(

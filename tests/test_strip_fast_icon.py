@@ -11,7 +11,7 @@ class FastIcon(unittest.TestCase):
         self.assertNotEqual(plain.keys[13].tobytes(),marked.keys[13].tobytes())
         self.assertEqual(renderer.render_key(14).tobytes(),marked.keys[13].tobytes())
 
-    def test_fast_button_is_a_centered_right_hand_touch_target(self):
+    def test_fast_button_is_an_independent_full_height_action_surface(self):
         config={
             'visual':{'theme':'pixel','stripMode':'knobs','stripBrightness':55},
             'knobs':[{'mode':mode} for mode in ('micro','scroll','reasoning','brightness')],
@@ -19,7 +19,8 @@ class FastIcon(unittest.TestCase):
         }
         config['buttons'][13]={'targetKey':'ACT06','enabled':True}
         image=N4VisualRenderer(config).render().keys[13]
-        self.assertEqual(image.getpixel((116,16)),(37,49,64))
-        self.assertEqual(image.getpixel((124,56)),(237,187,70))
-        self.assertEqual(image.getpixel((145,57)),(255,210,90))
-        self.assertEqual(image.getpixel((168,56)),(17,26,39))
+        self.assertEqual(image.getpixel((104,56)),(46,59,76))
+        self.assertEqual(image.getpixel((108,56)),(17,26,39))
+        self.assertEqual(image.getpixel((113,56)),(124,98,40))
+        self.assertEqual(image.getpixel((130,58)),(255,210,90))
+        self.assertEqual(image.getpixel((168,56)),(35,30,20))

@@ -477,6 +477,18 @@ function knobView(config, index) {
   };
 }
 
+function stripTouchAction(binding, index) {
+  if (index !== 13 || !binding.enabled || binding.targetKey !== 'ACT06') return null;
+  return {
+    targetKey: 'ACT06',
+    eyebrow: '快捷',
+    label: '加速',
+    icon: 'lightning',
+    scope: 'strip',
+    layout: 'split',
+  };
+}
+
 /**
  * Build a serialisable N4 render model from Micro lighting state and config.
  */
@@ -491,7 +503,7 @@ function createN4RenderModel(options = {}) {
     const source = sourceLightForTarget(binding.targetKey, lighting);
     const light = describeLight(binding.enabled ? source.light : LIGHT_DEFAULT, phase);
     const button = {
-      knobInfo:index>=10&&config.visual.stripMode==='knobs'?{index:index-10,...config.knobs[index-10],fastTouch:index===13&&binding.enabled&&binding.targetKey==='ACT06',brightness:options.localActions?.brightnessApplied===true?options.localActions.brightness:null,clock:index===10?clock:null}:null,
+      knobInfo:index>=10&&config.visual.stripMode==='knobs'?{index:index-10,...config.knobs[index-10],touchAction:stripTouchAction(binding,index),brightness:options.localActions?.brightnessApplied===true?options.localActions.brightness:null,clock:index===10?clock:null}:null,
       theme: config.visual.theme,
       index: index + 1,
       id: binding.id,
