@@ -17,6 +17,7 @@ class MiraboxLauncher : Form {
     readonly Button start = new Button { Text="启动全部", Left=24, Top=155, Width=120, Height=40 };
     readonly Button stop = new Button { Text="停止全部", Left=155, Top=155, Width=120, Height=40 };
     Process server, relay; IntPtr job; string url; bool busy;
+    bool relayRestarting; int relayRestartCount; DateTime relayRestartWindow;
     NotifyIcon tray; ContextMenuStrip trayMenu;
     readonly System.Windows.Forms.Timer serviceTimer=new System.Windows.Forms.Timer {Interval=2000};
     bool exitRequested, trayNoticeShown; readonly bool trayEnabled;
@@ -66,7 +67,29 @@ class MiraboxLauncher : Form {
         web.Click+=(s,e)=>OpenControlPage();
         logs.Click+=(s,e)=>{Directory.CreateDirectory(Path.Combine(root,"logs")); Process.Start("explorer.exe", "\""+Path.Combine(root,"logs")+"\"");};
         if(trayEnabled)EnsureTray();
-        serviceTimer.Tick+=async (s,e)=>{if(!busy && server!=null && (server.HasExited || (relay!=null && relay.HasExited))) {StopAll(); status.Text="服务已退出。请查看 logs 中的日志，再点击启动。若旧 Relay 仍运行，请先关闭旧命令窗口。";if(tray!=null&&!Visible)tray.ShowBalloonTip(4000,"N4 Bridge","服务已停止，双击托盘图标查看原因。",ToolTipIcon.Warning);}await CheckDeviceStatus();if(tray!=null)tray.Text=busy?"N4 Bridge · 正在处理":server!=null?"N4 Bridge · "+deviceSummary:"N4 Bridge · 服务已停止";};serviceTimer.Start();
+        serviceTimer.Tick+=async (s,e)=>{
+            if(!busy&&!relayRestarting&&server!=null) {
+                if(server.HasExited) {
+                    int exit=server.ExitCode;StopAll();
+                    status.Text="控制页服务已退出（exit="+exit+"）。请查看 logs\\webui.log，再点击启动。";
+                    if(tray!=null&&!Visible)tray.ShowBalloonTip(4000,"N4 Bridge","控制页服务已停止，双击托盘图标查看原因。",ToolTipIcon.Warning);
+                } else if(relay!=null&&relay.HasExited) {
+                    int exit=relay.ExitCode;relay.Dispose();relay=null;
+                    var now=DateTime.UtcNow;
+                    if((now-relayRestartWindow).TotalSeconds>60){relayRestartWindow=now;relayRestartCount=0;}
+                    if(relayRestartCount<3) {
+                        relayRestartCount++;
+                        await RestartRelay(exit);
+                    } else {
+                        StopAll();
+                        status.Text="Micro 桥接连续退出（最后 exit="+exit+"）。请查看 logs\\relay.log，再点击启动。";
+                        if(tray!=null&&!Visible)tray.ShowBalloonTip(5000,"N4 Bridge","Micro 桥接连续退出，服务已停止。",ToolTipIcon.Warning);
+                    }
+                }
+            }
+            await CheckDeviceStatus();
+            if(tray!=null)tray.Text=busy?"N4 Bridge · 正在处理":server!=null?"N4 Bridge · "+deviceSummary:"N4 Bridge · 服务已停止";
+        };serviceTimer.Start();
     }
     static bool Flag(Dictionary<string,object> obj,string key){object v;return obj!=null&&obj.TryGetValue(key,out v)&&v is bool&&(bool)v;}
     static string DeviceSummary(Dictionary<string,object> data){
@@ -130,8 +153,28 @@ class MiraboxLauncher : Form {
         if(post) {r.Method="POST";r.ContentType="application/json";var data=System.Text.Encoding.UTF8.GetBytes("{}");r.ContentLength=data.Length;using(var w=r.GetRequestStream())w.Write(data,0,data.Length);}
         using(var response=r.GetResponse()) using(var reader=new StreamReader(response.GetResponseStream())) return reader.ReadToEnd();
     }
+    async Task RestartRelay(int previousExit) {
+        if(relayRestarting||server==null||server.HasExited||exitRequested)return;
+        relayRestarting=true;
+        try {
+            status.Text="Micro 桥接已退出（exit="+previousExit+"），正在自动重启…";
+            relay=Launch("runtime/python/python.exe","scripts/micro-webui-relay.py --live --webui-url "+url,"relay");
+            await Task.Delay(1200);
+            CheckExit();
+            if(relay==null||relay.HasExited) {
+                int exit=relay==null?-1:relay.ExitCode;
+                if(relay!=null){relay.Dispose();relay=null;}
+                status.Text="Micro 桥接重启失败（exit="+exit+"），将在下次检查继续尝试。请查看 logs\\relay.log。";
+            } else {
+                status.Text="Micro 桥接已恢复。控制页与 N4 连接保持运行。\n"+url;
+            }
+        } catch(Exception error) {
+            if(!IsDisposed&&!exitRequested)status.Text="Micro 桥接重启异常："+error.Message+"。请查看 logs\\relay.log。";
+        } finally {relayRestarting=false;}
+    }
     async Task StartAll() {
         if(busy || server!=null)return;busy=true;start.Enabled=false;stop.Enabled=false;
+        relayRestartCount=0;relayRestartWindow=DateTime.UtcNow;
         string step="启动控制页";
         try {
             // Never take over an existing listener or terminate somebody else's service.

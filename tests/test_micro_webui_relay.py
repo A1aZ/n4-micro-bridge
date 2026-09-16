@@ -40,3 +40,50 @@ class MicroWebuiRelayTests(unittest.TestCase):
         relay=Relay(Api(),Transport())
         with self.assertRaises(OSError):relay.tick()
         self.assertEqual(len(calls),1)
+
+    def test_transient_input_timeout_keeps_relay_alive_and_recovers(self):
+        events=[];sent=[]
+        reply=encode_micro_message({'id':2,'result':{'ok':True}})[0]
+        class Api:
+            def __init__(self):self.input_calls=0
+            def request(self,route,body=None):
+                if route.endswith('/input?drain=1&limit=64'):
+                    self.input_calls+=1
+                    if self.input_calls==1:raise TimeoutError('node busy')
+                    return {'reports':[{'bytes':list(reply)}]}
+                return {'messages':[],'replies':[]}
+        class Transport:
+            def read_output(self,timeout_ms):return None
+            def push_input(self,report):sent.append(report)
+        relay=Relay(Api(),Transport(),events.append)
+        self.assertFalse(relay.tick())
+        # A real loop waits for the bounded backoff; make the regression test
+        # deterministic without sleeping.
+        relay._webui_next_retry=0
+        self.assertTrue(relay.tick())
+        self.assertEqual(sent,[reply])
+        self.assertEqual([event['event'] for event in events],['webui-deferred','webui-recovered'])
+
+    def test_transient_output_timeout_is_not_replayed(self):
+        request=encode_micro_message({'method':'sys.ping','id':3})[0]
+        events=[];output_calls=[];input_calls=[]
+        class Api:
+            def request(self,route,body=None):
+                if route.endswith('/output'):
+                    output_calls.append(body)
+                    raise TimeoutError('response timed out after write')
+                input_calls.append(route)
+                return {'reports':[]}
+        class Transport:
+            def __init__(self):self.reads=0
+            def read_output(self,timeout_ms):
+                self.reads+=1
+                return request if self.reads==1 else None
+            def push_input(self,report):raise AssertionError('input should not be pushed')
+        relay=Relay(Api(),Transport(),events.append)
+        self.assertFalse(relay.tick())
+        relay._webui_next_retry=0
+        self.assertTrue(relay.tick())
+        self.assertEqual(len(output_calls),1)
+        self.assertEqual(input_calls,['/api/transport/input?drain=1&limit=64'])
+        self.assertEqual([event['event'] for event in events],['webui-deferred','webui-recovered'])
